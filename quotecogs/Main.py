@@ -24,8 +24,6 @@ for i in server_config_raw:
 		on_reaction.append(int(i[0]))
 del server_config_raw
 
-quoted_messages = []
-
 class Main:
 	def __init__(self, bot):
 		self.bot = bot
@@ -35,9 +33,6 @@ class Main:
 			guild = self.bot.get_guild(payload.guild_id)
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)
-
-			if not user.permissions_in(channel).send_messages or payload.message_id in quoted_messages:
-				return
 
 			message = None
 			async for msg in channel.history(limit = 10000):
@@ -61,10 +56,6 @@ class Main:
 						embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
 				embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + channel.name)
 				await channel.send(embed = embed)
-
-				quoted_messages.append(message.id)
-				await asyncio.sleep(2)
-				quoted_messages.remove(message.id)
 
 	@commands.command()
 	async def help(self, ctx, command = None):
