@@ -10,6 +10,7 @@ c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS Prefixes (Guild TEXT unique, Prefix TEXT)")
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild TEXT unique, DelCommands TEXT, OnReaction TEXT, PinChannel TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
 # P.S: I'm very used to storing everything as TEXT,
 # so I'd appreciate if you don't change this syntax,
 # especially since the public Quote bot already
@@ -110,10 +111,13 @@ async def on_reaction_add(reaction, user):
 	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
 		await reaction.message.delete()
 
-# Prevents from reading other bot messages.
+from userhoundcogs.OwnerOnly import blacklist_ids
+
 @bot.event
 async def on_message(message):
-	if message.author.bot:
+	if message.guild and message.guild.id in blacklist_ids:
+		await message.guild.leave()
+	elif message.author.bot or message.author.id in blacklist_ids:
 		return
 
 	await bot.process_commands(message)
