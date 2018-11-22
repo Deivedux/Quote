@@ -24,6 +24,20 @@ else
                 else
                         if [ $choice -eq 4 ] ; then
                             echo "Updating to stable version.."
+                            if [ -d "/home/Quote" ]; then
+                                if [ -d "/home/Quote-Old" ]; then
+                                    rm /home/Quote-Old/* -f
+                                    mv -Ri /home/Quote/configs /home/Quote-Old/
+                                    git clone https://github.com/Deivedux/Quote.git /home/Quote
+                                    mv -Ri /home/Quote-Old/configs /home/Quote
+                                else
+                                    sudo mkdir /home/Quote-Old
+                                    mv -Ri /home/Quote/configs /home/Quote-Old/
+                                    git clone https://github.com/Deivedux/Quote.git /home/Quote
+                                fi
+                            else
+                                git clone https://github.com/Deivedux/Quote.git /home/
+                            fi
             fi
         fi
     fi
