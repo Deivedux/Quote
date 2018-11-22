@@ -3,26 +3,25 @@
 echo "Welcome to Quote launcher for Linux!"
 echo ""
 
-
 choice=4
               echo "1-- Launch The Bot"
               echo "2-- Launch With Auto-Restart"
               echo "3-- Update to latest version"
               echo "4-- Update to stable version"
 
-while [ $choice -eq 4 ]; do
+while [ "$choice" = "4" ]; do
 read choice
-if [ $choice -eq 1 ] ; then
+if [ "$choice" = "1" ] ; then
   run_bot
 else
-        if [ $choice -eq 2 ] ; then
+        if [ "$choice" = "2" ] ; then
             echo "Starting the bot with auto-restart.."
             echo "-to be added"
         else
-                if [ $choice -eq 3 ] ; then
+                if [ "$choice" = "3" ] ; then
                     echo "Updating to latest version.."
                 else
-                        if [ $choice -eq 4 ] ; then
+                        if [ "$choice" = "4" ] ; then
                             echo "Updating to stable version.."
                             if [ -d "/home/Quote" ]; then
                                 if [ -d "/home/Quote-Old" ]; then
