@@ -46,7 +46,7 @@ fi
 run_bot() {
   echo "Checking requirements.."
   if hash python3 2>/dev/null; then
-    if python -m pip install --user -r curl -L https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/requirements.txt | txt; then
+    if python -m pip install --user -r https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/requirements.txt; then
       echo "Starting Quote.."
       python quote.py
     else
