@@ -4,7 +4,7 @@ echo "Welcome to Quote launcher for Linux!"
 echo ""
 
 
-choices=4
+choice=4
               echo "1-- Launch The Bot"
               echo "2-- Launch With Auto-Restart"
               echo "3-- Update to latest version"
