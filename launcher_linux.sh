@@ -10,19 +10,19 @@ choices=4
               echo "3-- Update to latest version"
               echo "4-- Update to stable version"
 
-while [ $choice -eq 4]; do
+while [ $choice -eq 4 ]; do
 read choice
-if [ $choice -eq 1] ; then
+if [ $choice -eq 1 ] ; then
   run_bot
 else
-        if [ $choice -eq 2] ; then
+        if [ $choice -eq 2 ] ; then
             echo "Starting the bot with auto-restart.."
             echo "-to be added"
         else
-                if [ $choice -eq 3] ; then
+                if [ $choice -eq 3 ] ; then
                     echo "Updating to latest version.."
                 else
-                        if [ $choice -eq 4] ; then
+                        if [ $choice -eq 4 ] ; then
                             echo "Updating to stable version.."
             fi
         fi
