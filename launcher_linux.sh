@@ -4,13 +4,13 @@ echo "Welcome to Quote launcher for Linux!"
 echo ""
 
 
-choices=5
+choices=4
 echo "1-- Launch The Bot"
 echo "2-- Launch With Auto-Restart"
 echo "3-- Update to latest version"
 echo "4-- Update to stable version"
 
-while [ $choice -eq 5]; do
+while [ $choice -eq 4]; do
 read choice
 if [ $choice -eq 1] ; then
   run_bot
