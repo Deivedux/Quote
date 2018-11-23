@@ -30,14 +30,20 @@ else
                                     rm -rf /home/Quote -f
                                     git clone https://github.com/Deivedux/Quote.git /home/
                                     mv -v /home/Quote-Old/configs -t /home/Quote -f 
+				    echo ""
+				    echo "Done!"
                                 else
                                     sudo mkdir /home/Quote-Old
                                     mv -v /home/Quote/configs -t /home/Quote-Old -f 
                                     git clone https://github.com/Deivedux/Quote.git /home/
-				          mv -v /home/Quote-Old/configs -t /home/Quote -f
+				    mv -v /home/Quote-Old/configs -t /home/Quote -f
+				    echo ""
+				    echo "Done!"
                                 fi
                             else
                                 git clone https://github.com/Deivedux/Quote.git
+				echo ""
+				echo "Done!"
                             fi
             fi
         fi
