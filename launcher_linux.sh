@@ -10,7 +10,7 @@ choice=4
               echo "4-- Update to stable version"
 
 while [ "$choice" = "4" ]; do
-read choice -r
+read choice
 if [ "$choice" = "1" ] ; then
   run_bot
 else
