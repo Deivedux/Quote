@@ -22,7 +22,7 @@ To edit `config.json`, type `nano config.json`
 
 `token`, enter your bot token which can be found at [Discord Developers Page](https://discordapp.com/developers/applications/me). *See  GIF below.*
 
-[![](https://i.imgur.com/jaxgi2P.gifv)]
+![](https://i.imgur.com/jaxgi2P.gifv)
 
 
 `default_prefix`, the default prefix of your Quote bot. You can change it to whatever you like.
@@ -30,4 +30,4 @@ To edit `config.json`, type `nano config.json`
 
 `owner_ids`, these are the IDs of users who can use the owner only commands, including yourself. *See how to get IDs in the GIF below.*
 
-[![owner_ids](https://i.imgur.com/JK7fHOU.gifv)]
+![](https://i.imgur.com/JK7fHOU.gifv)
