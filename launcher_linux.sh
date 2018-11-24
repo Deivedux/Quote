@@ -20,7 +20,7 @@ else
         else
                 if [ "$choice" = "3" ] ; then
 			echo "Updating to latest version.."
-		    	if [ -d "/home/Quote" ] ; then
+		    	if [ -d "/home/Quote-Latest" ] ; then
 		    		if [ -d "/home/Quote-Old" ] ; then
 					rm /home/Quote-Old/* -f
 					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
