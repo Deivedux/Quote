@@ -1,12 +1,18 @@
 #Requirements
 
+**Python 3.5+**
+
 **Git**
 
 
 
 #Installing Requirements
 
-Open your console/terminal and type `apt install git`
+Open your console/terminal and type the following
+```
+apt install git
+apt install python3
+```
 
 
 
