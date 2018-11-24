@@ -16,7 +16,8 @@ if [ "$choice" = "1" ] ; then
 else
         if [ "$choice" = "2" ] ; then
             echo "Starting the bot with auto-restart.."
-            echo "-to be added"
+            sh autorestart_linux.sh
+	    exit 1
         else
                 if [ "$choice" = "3" ] ; then
                     echo "Updating to latest version.."
