@@ -26,6 +26,7 @@ else
 					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
 					rm -rf /home/Quote-Latest -f
 					git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
+					rm -rf /home/Quote-Latest/configs -f
 					mv -v /home/Quote-Old/configs -t /home/Quote-Latest -f
 					echo ""
 					echo "Done!"
@@ -33,7 +34,8 @@ else
 					sudo mkdir /home/Quote-Old
 					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
 					git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
-					mv -v /home/Quote-Old/configs -t /home/Quote-Latest -f
+					rm -rf /home/Quote-Latest/configs -f
+					mv -v /home/Quote-Old/configs -t /home/Quote-Latest/configs -f
 					echo ""
 					echo "Done!"
 				fi
@@ -53,6 +55,7 @@ else
                                     		mv -v /home/Quote/configs -t /home/Quote-Old -f 
                                     		rm -rf /home/Quote -f
                                     		git clone https://github.com/Deivedux/Quote.git /home/
+						rm -rf /home/Quote/configs -f
                                     		mv -v /home/Quote-Old/configs -t /home/Quote -f 
 				    		echo ""
 				    		echo "Done!"
@@ -60,6 +63,7 @@ else
                                     		sudo mkdir /home/Quote-Old
                                     		mv -v /home/Quote/configs -t /home/Quote-Old -f 
                                     		git clone https://github.com/Deivedux/Quote.git /home/
+						rm -rf /home/Quote/configs -f
 				    		mv -v /home/Quote-Old/configs -t /home/Quote -f
 				    		echo ""
 				    		echo "Done!"
