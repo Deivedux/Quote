@@ -24,7 +24,7 @@ else
                 else
                         if [ "$choice" = "4" ] ; then
                             echo "Updating to stable version.."
-                            if [ -d "/home/Quote" ] ; then
+                            if [ -d "/home/Quote-Latest" ] ; then
                                 if [ -d "/home/Quote-Old" ] ; then
                                     rm /home/Quote-Old/* -f
                                     mv -v /home/Quote/configs -t /home/Quote-Old -f 
