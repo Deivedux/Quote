@@ -23,22 +23,23 @@ else
 		    	if [ -d "/home/Quote" ] ; then
 		    		if [ -d "/home/Quote-Old" ] ; then
 					rm /home/Quote-Old/* -f
-					mv -v /home/Quote/configs -t /home/Quote-Old -f
-					rm -rf /home/Quote -f
-					git clone https://github.com/Deivedux/Quote/tree/dev.git /home/
-					mv -v /home/Quote-Old/configs -t /home/Quote -f
+					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
+					rm -rf /home/Quote-Latest -f
+					git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
+					mv -v /home/Quote-Old/configs -t /home/Quote-Latest -f
 					echo ""
 					echo "Done!"
 				else
 					sudo mkdir /home/Quote-Old
-					mv -v /home/Quote/configs -t /home/Quote-Old -f
-					git clone https://github.com/Deivedux/Quote/tree/dev.git /home/
-					mv -v /home/Quote-Old/configs -t /home/Quote -f
+					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
+					git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
+					mv -v /home/Quote-Old/configs -t /home/Quote-Latest -f
 					echo ""
 					echo "Done!"
 				fi
 			else
-			        git clone https://github.com/Deivedux/Quote/tree/dev.git /home/
+				sudo mkdir /home/Quote-Latest/
+			        git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
 			        echo ""
 			        echo "Done!"
 			fi
