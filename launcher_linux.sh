@@ -38,6 +38,10 @@ else
 					echo "Done!"
 				fi
 			else
+			        git clone https://github.com/Deivedux/Quote/tree/dev.git /home/
+			        echo ""
+			        echo "Done!"
+			fi
 		   
                 else
 			if [ "$choice" = "4" ] ; then
