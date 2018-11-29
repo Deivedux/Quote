@@ -34,3 +34,7 @@ To edit `config.json`, type `nano config.json`
 `owner_ids`, these are the IDs of users who can use the owner only commands, including yourself. *See how to get IDs in the GIF below.*
 
 ![](http://i.imgur.com/UQxBZfJ.gif)
+
+After you found out and copied your owner ID and the bot's token, your `config.json` should look something like this.
+
+![](https://i.imgur.com/MHjaCqh.png)
