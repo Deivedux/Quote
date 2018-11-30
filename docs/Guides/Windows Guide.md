@@ -4,7 +4,7 @@
 
 **[Python 3.5+](https://www.python.org/ftp/python/3.6.5/python-3.6.5.exe)**
 
-**[Notepad++](https://notepad-plus-plus.org/repository/7.x/7.6/npp.7.6.Installer.exe) - Or any decent text editor.
+**[Notepad++](https://notepad-plus-plus.org/repository/7.x/7.6/npp.7.6.Installer.exe) - Or any decent text editor.**
 
 
 
