@@ -56,3 +56,14 @@ Owner IDs:
 After you found out your owner ID and copied it, your `config.json` should look something like this.
 
 ![](https://i.imgur.com/MHjaCqh.png)
+
+
+# Inviting Your Bot
+
+Last but not least, inviting your bot.
+
+Replace `<bot_id>` with your bot's ID in this link: `https://discordapp.com/oauth2/authorize?client_id=<bot id>&permissions=84992&scope=bot`
+
+Once you replaced `<bot_id>` with your bot's ID, copy the link in a new tab (the current tab also works) and select your server.
+
+After that, you're all set. If you have any questions, ask in the [Official Support Server](https://discord.gg/sbySHxA).
