@@ -5,5 +5,7 @@ pages:
 - Hosting Guides:
     - Windows Guide: Guides/Windows Guide.md
     - Linux Guide: Guides/Linux Guide.md
+- Other Guides:
+    - Bug Reporting: Guides/Reporting Bugs.md
 
 theme: readthedocs
