@@ -28,6 +28,8 @@ To install Python 3.5+, click [here](https://www.python.org/ftp/python/3.6.5/pyt
 
 **Launch the setup with Administrator permission!**
 
+![](https://i.imgur.com/l5YzGWO.gif)
+
 ### Checking PIP version.
 
 Open `Command Prompt` by either pressing `Windows Key + R` and `cmd` or opening start menu and typing `Command Prompt`.
@@ -45,8 +47,6 @@ Once it launches, you're going to type the following in:
 ```
 curl -L https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.bat
 ```
-
-![](https://i.imgur.com/l5YzGWO.gif)
 
 
 
