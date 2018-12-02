@@ -18,7 +18,7 @@ c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
 
 from quotecogs.Main import prefixes
 
-with open('config.json') as json_data:
+with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 	default_prefix = response_json['default_prefix']
 	token = response_json['token']
