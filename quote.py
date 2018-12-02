@@ -111,7 +111,7 @@ async def on_reaction_add(reaction, user):
 	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
 		await reaction.message.delete()
 
-from userhoundcogs.OwnerOnly import blacklist_ids
+from quotecogs.OwnerOnly import blacklist_ids
 
 @bot.event
 async def on_message(message):
