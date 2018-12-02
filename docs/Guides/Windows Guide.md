@@ -1,6 +1,6 @@
 # Requirements
 
-**[Git for Windows](https://github.com/git-for-windows/git/releases/download/v2.19.1.windows.1/Git-2.19.1-64-bit.exe)**
+**[Git for Windows](https://git-scm.com/download/win)**
 
 **[Python 3.5+](https://www.python.org/ftp/python/3.6.5/python-3.6.5.exe)**
 
@@ -10,9 +10,25 @@
 
 # Installing Requirements
 
-To install Git, click [here](https://github.com/git-for-windows/git/releases/download/v2.19.1.windows.1/Git-2.19.1-64-bit.exe). **IMPORTANT: Make sure you install it to `C:/Program Files/`**
+## Git
+
+**Important: Install Git in `C:/Program Files/`! Refer to GIF below!**
+
+To install Git, click [here](https://github.com/git-for-windows/git/releases/download/v2.19.1.windows.1/Git-2.19.1-64-bit.exe).
+
+![](https://i.imgur.com/ggRHDrz.gif)
+
+## Python 
+
+**Important: Install Python in `C:/Program Files (x86)/`! Refer to GIF below!**
+
+Make a new folder in `C:/Program Files (x86)/` and call it `Python36`.
 
 To install Python 3.5+, click [here](https://www.python.org/ftp/python/3.6.5/python-3.6.5.exe).
+
+**Launch the setup with Administrator permission!**
+
+![](https://i.imgur.com/l5YzGWO.gif)
 
 
 
