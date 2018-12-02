@@ -18,7 +18,7 @@ c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
 
 from quotecogs.Main import prefixes
 
-with open('configs/config.json') as json_data:
+with open('config.json') as json_data:
 	response_json = json.load(json_data)
 	default_prefix = response_json['default_prefix']
 	token = response_json['token']
@@ -111,7 +111,7 @@ async def on_reaction_add(reaction, user):
 	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
 		await reaction.message.delete()
 
-from userhoundcogs.OwnerOnly import blacklist_ids
+from quotecogs.OwnerOnly import blacklist_ids
 
 @bot.event
 async def on_message(message):
