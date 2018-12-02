@@ -28,6 +28,24 @@ To install Python 3.5+, click [here](https://www.python.org/ftp/python/3.6.5/pyt
 
 **Launch the setup with Administrator permission!**
 
+### Checking PIP version.
+
+Open `Command Prompt` by either pressing `Windows Key + R` and `cmd` or opening start menu and typing `Command Prompt`.
+
+To check the pip version, type `pip -V`.
+
+If your pip version is not 18.1, update the pip by following how-to down below. If your pip version is 18.1, continue following this guide.
+
+### How-To Update PIP
+
+Open start menu and type `Command Prompt`. Launch the `Command Prompt` with Administrative permission (Right Click => `Run As Administrator`).
+
+Once it launches, you're going to type the following in:
+
+```
+curl -L https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.bat
+```
+
 ![](https://i.imgur.com/l5YzGWO.gif)
 
 
