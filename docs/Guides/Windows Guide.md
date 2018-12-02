@@ -40,7 +40,7 @@ If your pip version is not 18.1, update the pip by following how-to down below. 
 
 ### How-To Update PIP
 
-Open start menu and type `Command Prompt`. Launch the `Command Prompt` with Administrative permission (Right Click => `Run As Administrator`).
+Open start menu and type `Git BASH`. Launch it with Administrative permission (Right Click => `Run As Administrator`).
 
 Once it launches, you're going to type the following in:
 
