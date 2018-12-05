@@ -22,10 +22,10 @@ Other than modifying your discord client, you can make a bot to do it for you wi
 ---
 
 ## What messages are supported?
-  * • Normal message with content, sent either by a normal user or any different bot.
+  * Normal message with content, sent either by a normal user or any different bot.
 
-  * • Embed's color depends on the message author's color in the server by roles.
+  * Embed's color depends on the message author's color in the server by roles.
 
-  * • Message containing an image as an attachment will also be quoted, but if there are more than 1 images in the message then only the first image will be quoted (discord's limitations).
+  * Message containing an image as an attachment will also be quoted, but if there are more than 1 images in the message then only the first image will be quoted (discord's limitations).
 
-  * • Rich Embed messages will not be quoted, and there will never be plans to add support for them.
+  * Rich Embed messages will not be quoted, and there will never be plans to add support for them.
