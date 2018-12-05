@@ -8,8 +8,7 @@ from discord.ext import commands
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
-c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
+c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
 
 from cogs.Main import prefixes
 
@@ -108,13 +107,9 @@ async def on_reaction_add(reaction, user):
 	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
 		await reaction.message.delete()
 
-from cogs.OwnerOnly import blacklist_ids
-
 @bot.event
 async def on_message(message):
-	if message.guild and message.guild.id in blacklist_ids:
-		await message.guild.leave()
-	elif message.author.bot or message.author.id in blacklist_ids:
+	if message.author.bot:
 		return
 
 	await bot.process_commands(message)
