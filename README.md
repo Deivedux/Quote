@@ -5,19 +5,19 @@ Other than modifying your discord client, you can make a bot to do it for you wi
 ---
 
 ## Commands
-> ==`help`== - Show help message, or more details on a specific command.
+> ==help== - Show help message, or more details on a specific command.
 
-> ==`quote`== - Quote a message using a message ID, and optionally leave your own reply to a quoted message.
+> ==quote== - Quote a message using a message ID, and optionally leave your own reply to a quoted message.
 
-> ==`quotechan`== - Quote a message using a message ID from a specific channel.
+> ==quotechan== - Quote a message using a message ID from a specific channel.
 
-> ==`prefix`== - See currently set prefix, or change to a different prefix for this server.
+> ==prefix== - See currently set prefix, or change to a different prefix for this server.
 
-> ==`delcommands`== - Toggle this to let Quote auto-delete the quote command.
+> ==delcommands== - Toggle this to let Quote auto-delete the quote command.
 
-> ==`reactions`== - Toggle this to let users quote messages by adding 💬 reaction to them.
+> ==reactions== - Toggle this to let users quote messages by adding 💬 reaction to them.
 
-> ==`pinchannel`== - Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with 📌 to pin a message.
+> ==pinchannel== - Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with 📌 to pin a message.
 
 ---
 
