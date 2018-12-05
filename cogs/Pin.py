@@ -44,7 +44,7 @@ class Pin:
 
 			if message:
 				async for msg in channel.history(limit = 50):
-					if msg.content.startswith('📌 **Message ID:** ' + str(payload.message_id)):
+					if str(payload.message_id) in msg.content:
 						return
 
 				embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
