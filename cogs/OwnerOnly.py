@@ -4,7 +4,7 @@ import sqlite3
 from io import StringIO
 from discord.ext import commands
 
-conn = sqlite3.connect('QuoteBot.db')
+conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 global blacklist_ids

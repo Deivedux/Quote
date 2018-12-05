@@ -5,7 +5,7 @@ import json
 from io import StringIO
 from discord.ext import commands
 
-conn = sqlite3.connect('configs/QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
+conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel TEXT)")

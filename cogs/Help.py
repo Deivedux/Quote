@@ -1,9 +1,11 @@
 import discord
 import json
+import sqlite3
 from discord.ext import commands
 from cogs.Main import prefixes
 
-
+conn = sqlite3.connect('configs/QuoteBot.db')
+c = conn.cursor()
 
 class Help:
 	def __init__(self, bot):
