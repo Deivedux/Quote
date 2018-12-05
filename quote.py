@@ -8,21 +8,18 @@ from discord.ext import commands
 conn = sqlite3.connect('configs/QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
 c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
-c.execute("CREATE TABLE IF NOT EXISTS Prefixes (Guild TEXT unique, Prefix TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild TEXT unique, DelCommands TEXT, OnReaction TEXT, PinChannel TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel TEXT)")
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
-# P.S: I'm very used to storing everything as TEXT,
-# so I'd appreciate if you don't change this syntax,
-# especially since the public Quote bot already
-# uses this syntax.
 
-from quotecogs.Main import prefixes
+from cogs.Main import prefixes
 
 with open('config.json') as json_data:
 	response_json = json.load(json_data)
-	default_prefix = response_json['default_prefix']
-	token = response_json['token']
-	owners = response_json['owner_ids']
+
+default_prefix = response_json['default_prefix']
+token = response_json['token']
+owners = response_json['owner_ids']
+del response_json
 
 async def get_prefix(bot, message):
 	if message.guild:
@@ -37,7 +34,7 @@ bot = commands.Bot(command_prefix = get_prefix, case_insensitive = True, status 
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
-startup_extensions = ['quotecogs.Main', 'quotecogs.OwnerOnly', 'quotecogs.Pin']
+startup_extensions = ['cogs.Main', 'cogs.OwnerOnly', 'cogs.Pin']
 for cog in startup_extensions:
 	try:
 		bot.load_extension(cog)
@@ -111,7 +108,7 @@ async def on_reaction_add(reaction, user):
 	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
 		await reaction.message.delete()
 
-from quotecogs.OwnerOnly import blacklist_ids
+from cogs.OwnerOnly import blacklist_ids
 
 @bot.event
 async def on_message(message):
