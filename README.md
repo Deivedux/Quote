@@ -1,4 +1,7 @@
-# Stop self-botting, quote messages the legal way
+Title: Stop self-botting, quote messages the legal way
+
+[TITLE]
+
 If you always wanted to quote user messages without getting in trouble for it, then **Quote** is what you need.
 Other than modifying your discord client, you can make a bot to do it for you without any issues.
 
