@@ -1,5 +1,9 @@
 {
 	"token": "",
 	"default_prefix": ">",
+	"response_string": {
+		"success": ":white_check_mark:",
+		"error": ":x:"
+	},
 	"owner_ids": []
 }
