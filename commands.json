@@ -1,3 +1,37 @@
 {
-	
+	"help": {
+		"title": ["help"],
+		"description": "Show this message, or more details on a specific command.",
+		"examples": ["help"]
+	},
+	"quote": {
+		"title": ["quote", "q"],
+		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
+		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply"]
+	},
+	"quotechannel": {
+		"title": ["quotechannel", "quotechan", "qchan", "qc"],
+		"description": "Quote a message using a message ID from a specific channel.",
+		"examples": ["qc #channel 492444904681897986 My reply!"]
+	},
+	"prefix": {
+		"title": ["prefix"],
+		"description": "See currently set prefix, or change to a different prefix for this server.",
+		"examples": ["prefix", "prefix !"]
+	},
+	"delcommands": {
+		"title": ["delcommands", "delcmds"],
+		"description": "Toggle whether to automatically delete the quote command message before quoting.",
+		"examples": ["delcommands"]
+	},
+	"reactions": {
+		"title": ["reactions"],
+		"description": "Toggle whether to let users quote messages by adding :speech_balloon: reaction to them.",
+		"examples": ["reactions"]
+	},
+	"pinchannel": {
+		"title": ["pinchannel"],
+		"description": "Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with :pushpin: to pin a message.",
+		"examples": ["pinchannel #channel", "pinchannel"]
+	}
 }
