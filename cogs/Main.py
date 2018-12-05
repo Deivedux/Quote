@@ -178,7 +178,7 @@ class Main:
 
 			await ctx.send(content = '<:check:314349398811475968> **Prefix changed to `' + prefix + '`.**')
 
-	@commands.command()
+	@commands.command(aliases = ['delcmds'])
 	async def delcommands(self, ctx):
 		if not ctx.guild or not ctx.author.guild_permissions.manage_guild:
 			return
