@@ -33,7 +33,7 @@ bot = commands.Bot(command_prefix = get_prefix, case_insensitive = True, status 
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
-startup_extensions = ['cogs.Main', 'cogs.OwnerOnly', 'cogs.Pin']
+startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin']
 for cog in startup_extensions:
 	try:
 		bot.load_extension(cog)
