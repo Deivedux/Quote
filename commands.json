@@ -30,7 +30,7 @@
 		"examples": ["reactions"]
 	},
 	"pinchannel": {
-		"title": ["pinchannel"],
+		"title": ["pinchannel", "pinc"],
 		"description": "Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with :pushpin: to pin a message.",
 		"examples": ["pinchannel #channel", "pinchannel"]
 	}
