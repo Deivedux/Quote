@@ -5,7 +5,7 @@ import json
 from io import StringIO
 from discord.ext import commands
 
-conn = sqlite3.connect('QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
+conn = sqlite3.connect('configs/QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
 c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS Prefixes (Guild TEXT unique, Prefix TEXT)")
@@ -18,7 +18,7 @@ c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id TEXT unique)")
 
 from quotecogs.Main import prefixes
 
-with open('config.json') as json_data:
+with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 	default_prefix = response_json['default_prefix']
 	token = response_json['token']
