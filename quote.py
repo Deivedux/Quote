@@ -29,7 +29,7 @@ async def get_prefix(bot, message):
 	else:
 		return commands.when_mentioned_or(default_prefix)(bot, message)
 
-bot = commands.Bot(command_prefix = get_prefix, case_insensitive = True, status = discord.Status.idle, activity = discord.Game('starting up...'), max_messages = 100)
+bot = commands.Bot(command_prefix = get_prefix, case_insensitive = True, status = discord.Status.idle, activity = discord.Game('starting up...'), fetch_offline_members = False, max_messages = 100)
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
