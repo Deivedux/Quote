@@ -39,8 +39,8 @@ class Help:
 			except KeyError:
 				return await ctx.send(content = error_string + ' **Command with that name does not exist.**')
 
-			embed = discord.Embed(title = ' / '.join(['`' + guild_prefix + i '`' for i in command_help['title']]), description = command_help['description'], color = 0x08FF00)
-			embed.add_field(name = 'Example', value = ' or '.join(['`' + guild_prefix + i '`' for i in command_help['examples']]))
+			embed = discord.Embed(title = ' / '.join(['`' + guild_prefix + i + '`' for i in command_help['title']]), description = command_help['description'], color = 0x08FF00)
+			embed.add_field(name = 'Example', value = ' or '.join(['`' + guild_prefix + i + '`' for i in command_help['examples']]))
 			await ctx.send(embed = embed)
 
 
