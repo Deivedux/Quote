@@ -2,7 +2,7 @@ import discord
 import sqlite3
 from discord.ext import commands
 
-conn = sqlite3.connect('QuoteBot.db')
+conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
