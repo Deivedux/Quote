@@ -138,10 +138,10 @@ class Main:
 				return await ctx.send(content = '<:xmark:314349398824058880> **Invalid prefix format. Make sure of the following:\n• Prefix is not over 5 characters long.\n• Prefix does not contain new lines.**')
 
 			try:
-				c.execute("INSERT INTO Prefixes (Guild, Prefix) VALUES ('" + str(ctx.guild.id) + "', '" + str(prefix).replace('\'', '\'\'') + "')")
+				c.execute("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
 				conn.commit()
 			except sqlite3.IntegrityError:
-				c.execute("UPDATE Prefixes SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
+				c.execute("UPDATE ServerConfig SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
 				conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
