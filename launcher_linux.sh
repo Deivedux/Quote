@@ -8,6 +8,7 @@ choice=4
         echo "2-- Launch With Auto-Restart"
         echo "3-- Update to latest version"
         echo "4-- Update to stable version"
+	echo "By selfhosting, you agree to the following terms:"
 
 while [ "$choice" = "4" ]; do
 read choice
