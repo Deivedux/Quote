@@ -4,7 +4,7 @@ import sqlite3
 from io import StringIO
 from discord.ext import commands
 
-conn = sqlite3.connect('QuoteBot.db')
+conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 global blacklist_ids
@@ -16,7 +16,7 @@ for i in blacklist_ids_raw:
 	blacklist_ids.append(int(i[0]))
 del blacklist_ids_raw
 
-with open('config.json') as json_data:
+with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 	owners = response_json['owner_ids']
 
