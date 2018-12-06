@@ -7,7 +7,7 @@ from discord.ext import commands
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
-with open('config.json') as json_data:
+with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 	owners = response_json['owner_ids']
 

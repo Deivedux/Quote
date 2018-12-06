@@ -12,7 +12,7 @@ c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix
 
 from cogs.Main import prefixes
 
-with open('config.json') as json_data:
+with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 
 default_prefix = response_json['default_prefix']
