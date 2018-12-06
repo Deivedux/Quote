@@ -4,7 +4,7 @@ import asyncio
 import sqlite3
 from discord.ext import commands
 
-conn = sqlite3.connect('QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
+conn = sqlite3.connect('configs/QuoteBot.db', detect_types = sqlite3.PARSE_DECLTYPES)
 c = conn.cursor()
 
 prefixes_raw = c.execute("SELECT * FROM Prefixes").fetchall()
