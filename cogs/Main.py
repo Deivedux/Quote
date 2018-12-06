@@ -2,6 +2,7 @@ import discord
 import datetime
 import asyncio
 import sqlite3
+import json
 from discord.ext import commands
 
 conn = sqlite3.connect('configs/QuoteBot.db')
@@ -20,6 +21,13 @@ for i in server_config_raw:
 	if i[3] != None:
 		on_reaction.append(int(i[0]))
 del server_config_raw
+
+with open('configs/config.json') as json_data:
+	response_json = json.load(json_data)
+
+success_string = response_json['response_string']['success']
+error_string = response_json['response_string']['error']
+del response_json
 
 def quote_embed(message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
@@ -82,7 +90,7 @@ class Main:
 							break
 
 		if not message:
-			await ctx.send(content = '<:xmark:314349398824058880> **Could not find the specified message.**')
+			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
 			await ctx.send(embed = quote_embed(message, ctx.author))
 
@@ -108,7 +116,7 @@ class Main:
 					break
 
 		if not message:
-			await ctx.send(content = '<:xmark:314349398824058880> **Could not find the specified message.**')
+			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
 			await ctx.send(embed = quote_embed(message, ctx.author))
 
@@ -135,7 +143,7 @@ class Main:
 				return
 
 			if len(prefix) > 5 or '\n' in prefix:
-				return await ctx.send(content = '<:xmark:314349398824058880> **Invalid prefix format. Make sure of the following:\n• Prefix is not over 5 characters long.\n• Prefix does not contain new lines.**')
+				return await ctx.send(content = error_string + ' **Invalid prefix format. Make sure of the following:\n• Prefix is not over 5 characters long.\n• Prefix does not contain new lines.**')
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
@@ -145,7 +153,7 @@ class Main:
 				conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
-			await ctx.send(content = '<:check:314349398811475968> **Prefix changed to `' + prefix + '`.**')
+			await ctx.send(content = success_string + ' **Prefix changed to `' + prefix + '`.**')
 
 	@commands.command(aliases = ['delcmds'])
 	async def delcommands(self, ctx):
@@ -162,7 +170,7 @@ class Main:
 				conn.commit()
 			del_commands.append(ctx.guild.id)
 
-			await ctx.send(content = '<:check:314349398811475968> **Auto-delete of quote command enabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote command enabled.**')
 
 		else:
 
@@ -170,7 +178,7 @@ class Main:
 			conn.commit()
 			del_commands.remove(ctx.guild.id)
 
-			await ctx.send(content = '<:check:314349398811475968> **Auto-delete of quote command disabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote command disabled.**')
 
 	@commands.command()
 	async def reactions(self, ctx):
@@ -187,7 +195,7 @@ class Main:
 				conn.commit()
 			on_reaction.append(ctx.guild.id)
 
-			await ctx.send(content = '<:check:314349398811475968> **Quoting messages on reaction enabled.**')
+			await ctx.send(content = success_string + ' **Quoting messages on reaction enabled.**')
 
 		else:
 
@@ -195,7 +203,7 @@ class Main:
 			conn.commit()
 			on_reaction.remove(ctx.guild.id)
 
-			await ctx.send(content = '<:check:314349398811475968> **Quoting messages on reaction disabled.**')
+			await ctx.send(content = success_string + ' **Quoting messages on reaction disabled.**')
 
 
 def setup(bot):
