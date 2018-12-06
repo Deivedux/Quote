@@ -7,22 +7,33 @@ from discord.ext import commands
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
-prefixes_raw = c.execute("SELECT * FROM Prefixes").fetchall()
+server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
 global prefixes
 prefixes = {}
-for i in prefixes_raw:
-	prefixes[int(i[0])] = str(i[1])
-del prefixes_raw
-
-server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
 del_commands = []
 on_reaction = []
 for i in server_config_raw:
 	if i[1] != None:
-		del_commands.append(int(i[0]))
+		prefixes[int(i[0])] = str(i[1])
 	if i[2] != None:
+		del_commands.append(int(i[0]))
+	if i[3] != None:
 		on_reaction.append(int(i[0]))
 del server_config_raw
+
+def quote_embed(message, user):
+	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
+		embed = discord.Embed(description = message.content, timestamp = message.created_at)
+	else:
+		embed = discord.Embed(description = message.content, color = message.author.color,  timestamp = message.created_at)
+	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
+	if message.attachments:
+		if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
+			embed.set_image(url = message.attachments[0].url)
+		else:
+			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
+	embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + message.channel.name)
+	return embed
 
 class Main:
 	def __init__(self, bot):
@@ -41,21 +52,7 @@ class Main:
 					break
 
 			if message:
-				if message.author not in guild.members or message.author.color == discord.Colour.default():
-					embed = discord.Embed(description = message.content, timestamp = message.created_at)
-				else:
-					embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
-				embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(payload.guild_id) + '/' + str(payload.channel_id) + '/' + str(payload.message_id))
-				if message.attachments:
-					if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
-						embed.set_image(url = message.attachments[0].url)
-					else:
-						attachments = []
-						for attachment in message.attachments:
-							attachments.append('[' + str(attachment.filename) + '](' + str(attachment.url) + ')')
-						embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
-				embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + channel.name)
-				await channel.send(embed = embed)
+				await channel.send(embed = quote_embed(message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int, *, reply = None):
@@ -87,21 +84,7 @@ class Main:
 		if not message:
 			await ctx.send(content = '<:xmark:314349398824058880> **Could not find the specified message.**')
 		else:
-			if message.author not in ctx.guild.members or message.author.color == discord.Colour.default():
-				embed = discord.Embed(description = message.content, timestamp = message.created_at)
-			else:
-				embed = discord.Embed(description = message.content, color = message.author.color,  timestamp = message.created_at)
-			embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(ctx.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
-			if message.attachments:
-				if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
-					embed.set_image(url = message.attachments[0].url)
-				else:
-					attachments = []
-					for attachment in message.attachments:
-						attachments.append('[' + str(attachment.filename) + '](' + str(attachment.url) + ')')
-					embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
-			embed.set_footer(text = 'Requester: ' + str(ctx.author) + ' | in channel: #' + message.channel.name)
-			await ctx.send(embed = embed)
+			await ctx.send(embed = quote_embed(message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
@@ -127,21 +110,7 @@ class Main:
 		if not message:
 			await ctx.send(content = '<:xmark:314349398824058880> **Could not find the specified message.**')
 		else:
-			if message.author not in ctx.guild.members or message.author.color == discord.Colour.default():
-				embed = discord.Embed(description = message.content, timestamp = message.created_at)
-			else:
-				embed = discord.Embed(description = message.content, color = message.author.color,  timestamp = message.created_at)
-			embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(ctx.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
-			if message.attachments:
-				if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
-					embed.set_image(url = message.attachments[0].url)
-				else:
-					attachments = []
-					for attachment in message.attachments:
-						attachments.append('[' + str(attachment.filename) + '](' + str(attachment.url) + ')')
-					embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
-			embed.set_footer(text = 'Requester: ' + str(ctx.author) + ' | in channel: #' + message.channel.name)
-			await ctx.send(embed = embed)
+			await ctx.send(embed = quote_embed(message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
