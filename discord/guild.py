@@ -25,8 +25,6 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import copy
-import asyncio
-
 from collections import namedtuple, defaultdict
 
 from . import utils
@@ -37,7 +35,7 @@ from .permissions import PermissionOverwrite
 from .colour import Colour
 from .errors import InvalidArgument, ClientException
 from .channel import *
-from .enums import VoiceRegion, Status, ChannelType, try_enum, VerificationLevel, ContentFilter
+from .enums import VoiceRegion, Status, ChannelType, try_enum, VerificationLevel, ContentFilter, NotificationLevel
 from .mixins import Hashable
 from .utils import valid_icon_size
 from .user import User
@@ -76,8 +74,6 @@ class Guild(Hashable):
     ----------
     name: :class:`str`
         The guild name.
-    roles
-        A :class:`list` of :class:`Role` that the guild has available.
     emojis
         A :class:`tuple` of :class:`Emoji` that the guild owns.
     region: :class:`VoiceRegion`
@@ -107,6 +103,8 @@ class Guild(Hashable):
         The guild's verification level.
     explicit_content_filter: :class:`ContentFilter`
         The guild's explicit content filter.
+    default_notifications: :class:`NotificationLevel`
+        The guild's notification settings.
     features: List[:class:`str`]
         A list of features that the guild has. They are currently as follows:
 
@@ -122,10 +120,10 @@ class Guild(Hashable):
 
     __slots__ = ('afk_timeout', 'afk_channel', '_members', '_channels', 'icon',
                  'name', 'id', 'unavailable', 'name', 'region', '_state',
-                 '_default_role', 'roles', '_member_count', '_large',
+                 '_default_role', '_roles', '_member_count', '_large',
                  'owner_id', 'mfa_level', 'emojis', 'features',
                  'verification_level', 'explicit_content_filter', 'splash',
-                 '_voice_states', '_system_channel_id', )
+                 '_voice_states', '_system_channel_id', 'default_notifications')
 
     def __init__(self, *, data, state):
         self._channels = {}
@@ -182,20 +180,22 @@ class Guild(Hashable):
         # its position because it's stuck at position 0. Luckily x += False
         # is equivalent to adding 0. So we cast the position to a bool and
         # increment it.
-        for r in self.roles:
-            r.position += bool(r.position)
+        for r in self._roles.values():
+            r.position += (not r.is_default())
 
-        self.roles.append(role)
+        self._roles[role.id] = role
 
-    def _remove_role(self, role):
-        # this raises ValueError if it fails..
-        self.roles.remove(role)
+    def _remove_role(self, role_id):
+        # this raises KeyError if it fails..
+        role = self._roles.pop(role_id)
 
         # since it didn't, we can change the positions now
         # basically the same as above except we only decrement
         # the position if we're above the role we deleted.
-        for r in self.roles:
+        for r in self._roles.values():
             r.position -= r.position > role.position
+
+        return role
 
     def _from_data(self, guild):
         # according to Stan, this is always available even if the guild is unavailable
@@ -207,20 +207,26 @@ class Guild(Hashable):
         self.name = guild.get('name')
         self.region = try_enum(VoiceRegion, guild.get('region'))
         self.verification_level = try_enum(VerificationLevel, guild.get('verification_level'))
+        self.default_notifications = try_enum(NotificationLevel, guild.get('default_message_notifications'))
         self.explicit_content_filter = try_enum(ContentFilter, guild.get('explicit_content_filter', 0))
         self.afk_timeout = guild.get('afk_timeout')
         self.icon = guild.get('icon')
         self.unavailable = guild.get('unavailable', False)
         self.id = int(guild['id'])
-        self.roles = [Role(guild=self, data=r, state=self._state) for r in guild.get('roles', [])]
+        self._roles = {}
+        state = self._state # speed up attribute access
+        for r in guild.get('roles', []):
+            role = Role(guild=self, data=r, state=state)
+            self._roles[role.id] = role
+
         self.mfa_level = guild.get('mfa_level')
-        self.emojis = tuple(map(lambda d: self._state.store_emoji(self, d), guild.get('emojis', [])))
+        self.emojis = tuple(map(lambda d: state.store_emoji(self, d), guild.get('emojis', [])))
         self.features = guild.get('features', [])
         self.splash = guild.get('splash')
         self._system_channel_id = utils._get_as_snowflake(guild, 'system_channel_id')
 
         for mdata in guild.get('members', []):
-            member = Member(data=mdata, guild=self, state=self._state)
+            member = Member(data=mdata, guild=self, state=state)
             self._add_member(member)
 
         self._sync(guild)
@@ -243,7 +249,7 @@ class Guild(Hashable):
             member = self.get_member(user_id)
             if member is not None:
                 member.status = try_enum(Status, presence['status'])
-                member.activity = create_activity(presence.get('game'))
+                member.activities = tuple(map(create_activity, presence.get('activities', [])))
 
         if 'channels' in data:
             channels = data['channels']
@@ -364,17 +370,30 @@ class Guild(Hashable):
 
     @property
     def members(self):
-        """List[:class:`Member`]: A list of members that belongs to this guild."""
+        """List[:class:`Member`]: A list of members that belong to this guild."""
         return list(self._members.values())
 
     def get_member(self, user_id):
         """Returns a :class:`Member` with the given ID. If not found, returns None."""
         return self._members.get(user_id)
 
+    @property
+    def roles(self):
+        """Returns a :class:`list` of the guild's roles in hierarchy order.
+
+        The first element of this list will be the lowest role in the
+        hierarchy.
+        """
+        return sorted(self._roles.values())
+
+    def get_role(self, role_id):
+        """Returns a :class:`Role` with the given ID. If not found, returns None."""
+        return self._roles.get(role_id)
+
     @utils.cached_slot_property('_default_role')
     def default_role(self):
         """Gets the @everyone role that all members have by default."""
-        return utils.find(lambda r: r.is_default(), self.roles)
+        return utils.find(lambda r: r.is_default(), self._roles.values())
 
     @property
     def owner(self):
@@ -387,10 +406,10 @@ class Guild(Hashable):
         return self.icon_url_as()
 
     def icon_url_as(self, *, format='webp', size=1024):
-        """Returns a friendly URL version of the guild's icon. Returns and empty string if it has no icon.
+        """Returns a friendly URL version of the guild's icon. Returns an empty string if it has no icon.
 
         The format must be one of 'webp', 'jpeg', 'jpg', or 'png'. The
-        size must be a power of 2 between 16 and 1024.
+        size must be a power of 2 between 16 and 2048.
 
         Parameters
         -----------
@@ -410,7 +429,7 @@ class Guild(Hashable):
             Bad image format passed to ``format`` or invalid ``size``.
         """
         if not valid_icon_size(size):
-            raise InvalidArgument("size must be a power of 2 between 16 and 1024")
+            raise InvalidArgument("size must be a power of 2 between 16 and 2048")
         if format not in VALID_ICON_FORMATS:
             raise InvalidArgument("format must be one of {}".format(VALID_ICON_FORMATS))
 
@@ -422,9 +441,40 @@ class Guild(Hashable):
     @property
     def splash_url(self):
         """Returns the URL version of the guild's invite splash. Returns an empty string if it has no splash."""
+        return self.splash_url_as()
+
+    def splash_url_as(self, *, format='webp', size=2048):
+        """Returns a friendly URL version of the guild's invite splash. Returns an empty string if it has no splash.
+
+        The format must be one of 'webp', 'jpeg', 'jpg', or 'png'. The
+        size must be a power of 2 between 16 and 2048.
+
+        Parameters
+        -----------
+        format: str
+            The format to attempt to convert the splash to.
+        size: int
+            The size of the image to display.
+
+        Returns
+        --------
+        str
+            The resulting CDN URL.
+
+        Raises
+        ------
+        InvalidArgument
+            Bad image format passed to ``format`` or invalid ``size``.
+        """
+        if not valid_icon_size(size):
+            raise InvalidArgument("size must be a power of 2 between 16 and 2048")
+        if format not in VALID_ICON_FORMATS:
+            raise InvalidArgument("format must be one of {}".format(VALID_ICON_FORMATS))
+
         if self.splash is None:
             return ''
-        return 'https://cdn.discordapp.com/splashes/{0.id}/{0.splash}.jpg?size=2048'.format(self)
+
+        return 'https://cdn.discordapp.com/splashes/{0.id}/{0.splash}.{1}?size={2}'.format(self, format, size)
 
     @property
     def member_count(self):
@@ -458,15 +508,6 @@ class Guild(Hashable):
     def created_at(self):
         """Returns the guild's creation time in UTC."""
         return utils.snowflake_time(self.id)
-
-    @property
-    def role_hierarchy(self):
-        """Returns the guild's roles in the order of the hierarchy.
-
-        The first element of this list will be the highest role in the
-        hierarchy.
-        """
-        return sorted(self.roles, reverse=True)
 
     def get_member_named(self, name):
         """Returns the first member found that matches the name provided.
@@ -543,13 +584,13 @@ class Guild(Hashable):
         return self._state.http.create_channel(self.id, name, channel_type.value, parent_id=parent_id,
                                                permission_overwrites=perms, reason=reason)
 
-    @asyncio.coroutine
-    def create_text_channel(self, name, *, overwrites=None, category=None, reason=None):
+    async def create_text_channel(self, name, *, overwrites=None, category=None, reason=None):
         """|coro|
 
         Creates a :class:`TextChannel` for the guild.
 
-        Note that you need the proper permissions to create the channel.
+        Note that you need the :attr:`~Permissions.manage_channels` permission
+        to create the channel.
 
         The ``overwrites`` parameter can be used to create a 'secret'
         channel upon creation. This parameter expects a :class:`dict` of
@@ -605,28 +646,26 @@ class Guild(Hashable):
         :class:`TextChannel`
             The channel that was just created.
         """
-        data = yield from self._create_channel(name, overwrites, ChannelType.text, category, reason=reason)
+        data = await self._create_channel(name, overwrites, ChannelType.text, category, reason=reason)
         channel = TextChannel(state=self._state, guild=self, data=data)
 
         # temporarily add to the cache
         self._channels[channel.id] = channel
         return channel
 
-    @asyncio.coroutine
-    def create_voice_channel(self, name, *, overwrites=None, category=None, reason=None):
+    async def create_voice_channel(self, name, *, overwrites=None, category=None, reason=None):
         """|coro|
 
         Same as :meth:`create_text_channel` except makes a :class:`VoiceChannel` instead.
         """
-        data = yield from self._create_channel(name, overwrites, ChannelType.voice, category, reason=reason)
+        data = await self._create_channel(name, overwrites, ChannelType.voice, category, reason=reason)
         channel = VoiceChannel(state=self._state, guild=self, data=data)
 
         # temporarily add to the cache
         self._channels[channel.id] = channel
         return channel
 
-    @asyncio.coroutine
-    def create_category(self, name, *, overwrites=None, reason=None):
+    async def create_category(self, name, *, overwrites=None, reason=None):
         """|coro|
 
         Same as :meth:`create_text_channel` except makes a :class:`CategoryChannel` instead.
@@ -636,7 +675,7 @@ class Guild(Hashable):
             The ``category`` parameter is not supported in this function since categories
             cannot have categories.
         """
-        data = yield from self._create_channel(name, overwrites, ChannelType.category, reason=reason)
+        data = await self._create_channel(name, overwrites, ChannelType.category, reason=reason)
         channel = CategoryChannel(state=self._state, guild=self, data=data)
 
         # temporarily add to the cache
@@ -645,8 +684,7 @@ class Guild(Hashable):
 
     create_category_channel = create_category
 
-    @asyncio.coroutine
-    def leave(self):
+    async def leave(self):
         """|coro|
 
         Leaves the guild.
@@ -661,10 +699,9 @@ class Guild(Hashable):
         HTTPException
             Leaving the guild failed.
         """
-        yield from self._state.http.leave_guild(self.id)
+        await self._state.http.leave_guild(self.id)
 
-    @asyncio.coroutine
-    def delete(self):
+    async def delete(self):
         """|coro|
 
         Deletes the guild. You must be the guild owner to delete the
@@ -678,10 +715,9 @@ class Guild(Hashable):
             You do not have permissions to delete the guild.
         """
 
-        yield from self._state.http.delete_guild(self.id)
+        await self._state.http.delete_guild(self.id)
 
-    @asyncio.coroutine
-    def edit(self, *, reason=None, **fields):
+    async def edit(self, *, reason=None, **fields):
         """|coro|
 
         Edits the guild.
@@ -694,10 +730,10 @@ class Guild(Hashable):
         name: str
             The new name of the guild.
         icon: bytes
-            A *bytes-like* object representing the icon. Only PNG/JPEG supported.
+            A :term:`py:bytes-like object` representing the icon. Only PNG/JPEG supported.
             Could be ``None`` to denote removal of the icon.
         splash: bytes
-            A *bytes-like* object representing the invite splash.
+            A :term:`py:bytes-like object` representing the invite splash.
             Only PNG/JPEG supported. Could be ``None`` to denote removing the
             splash. Only available for partnered guilds with ``INVITE_SPLASH``
             feature.
@@ -712,6 +748,8 @@ class Guild(Hashable):
             be owner of the guild to do this.
         verification_level: :class:`VerificationLevel`
             The new verification level for the guild.
+        default_notifications: :class:`NotificationLevel`
+            The new default notification level for the guild.
         vanity_code: str
             The new vanity code for the guild.
         system_channel: Optional[:class:`TextChannel`]
@@ -747,7 +785,7 @@ class Guild(Hashable):
         except KeyError:
             pass
         else:
-            yield from http.change_vanity_code(self.id, vanity_code, reason=reason)
+            await http.change_vanity_code(self.id, vanity_code, reason=reason)
 
         try:
             splash_bytes = fields['splash']
@@ -761,6 +799,13 @@ class Guild(Hashable):
 
         fields['icon'] = icon
         fields['splash'] = splash
+
+        try:
+            default_message_notifications = int(fields.pop('default_notifications'))
+        except (TypeError, KeyError):
+            pass
+        else:
+            fields['default_message_notifications'] = default_message_notifications
 
         try:
             afk_channel = fields.pop('afk_channel')
@@ -797,21 +842,54 @@ class Guild(Hashable):
 
         fields['verification_level'] = level.value
 
-        yield from http.edit_guild(self.id, reason=reason, **fields)
+        await http.edit_guild(self.id, reason=reason, **fields)
 
+    async def get_ban(self, user):
+        """|coro|
 
-    @asyncio.coroutine
-    def bans(self):
+        Retrieves the :class:`BanEntry` for a user, which is a namedtuple
+        with a ``user`` and ``reason`` field. See :meth:`bans` for more
+        information.
+
+        You must have the :attr:`~Permissions.ban_members` permission
+        to get this information.
+
+        Parameters
+        -----------
+        user: :class:`abc.Snowflake`
+            The user to get ban information from.
+
+        Raises
+        ------
+        Forbidden
+            You do not have proper permissions to get the information.
+        NotFound
+            This user is not banned.
+        HTTPException
+            An error occurred while fetching the information.
+
+        Returns
+        -------
+        BanEntry
+            The BanEntry object for the specified user.
+        """
+        data = await self._state.http.get_ban(user.id, self.id)
+        return BanEntry(
+            user=User(state=self._state, data=data['user']),
+            reason=data['reason']
+        )
+
+    async def bans(self):
         """|coro|
 
         Retrieves all the users that are banned from the guild.
 
-        This coroutine returns a :class:`list` of BanEntry objects. Which is a
+        This coroutine returns a :class:`list` of BanEntry objects, which is a
         namedtuple with a ``user`` field to denote the :class:`User`
         that got banned along with a ``reason`` field specifying
         why the user was banned that could be set to ``None``.
 
-        You must have :attr:`~Permissions.ban_members` permission
+        You must have the :attr:`~Permissions.ban_members` permission
         to get this information.
 
         Raises
@@ -827,13 +905,12 @@ class Guild(Hashable):
             A list of BanEntry objects.
         """
 
-        data = yield from self._state.http.get_bans(self.id)
+        data = await self._state.http.get_bans(self.id)
         return [BanEntry(user=User(state=self._state, data=e['user']),
                          reason=e['reason'])
                 for e in data]
 
-    @asyncio.coroutine
-    def prune_members(self, *, days, reason=None):
+    async def prune_members(self, *, days, reason=None):
         """|coro|
 
         Prunes the guild from its inactive members.
@@ -872,11 +949,10 @@ class Guild(Hashable):
         if not isinstance(days, int):
             raise InvalidArgument('Expected int for ``days``, received {0.__class__.__name__} instead.'.format(days))
 
-        data = yield from self._state.http.prune_members(self.id, days, reason=reason)
+        data = await self._state.http.prune_members(self.id, days, reason=reason)
         return data['pruned']
 
-    @asyncio.coroutine
-    def webhooks(self):
+    async def webhooks(self):
         """|coro|
 
         Gets the list of webhooks from this guild.
@@ -894,11 +970,10 @@ class Guild(Hashable):
             The webhooks for this guild.
         """
 
-        data = yield from self._state.http.guild_webhooks(self.id)
+        data = await self._state.http.guild_webhooks(self.id)
         return [Webhook.from_state(d, state=self._state) for d in data]
 
-    @asyncio.coroutine
-    def estimate_pruned_members(self, *, days):
+    async def estimate_pruned_members(self, *, days):
         """|coro|
 
         Similar to :meth:`prune_members` except instead of actually
@@ -928,16 +1003,16 @@ class Guild(Hashable):
         if not isinstance(days, int):
             raise InvalidArgument('Expected int for ``days``, received {0.__class__.__name__} instead.'.format(days))
 
-        data = yield from self._state.http.estimate_pruned_members(self.id, days)
+        data = await self._state.http.estimate_pruned_members(self.id, days)
         return data['pruned']
 
-    @asyncio.coroutine
-    def invites(self):
+    async def invites(self):
         """|coro|
 
         Returns a list of all active instant invites from the guild.
 
-        You must have :attr:`~Permissions.manage_guild` to get this information.
+        You must have the :attr:`~Permissions.manage_guild` permission to get
+        this information.
 
         Raises
         -------
@@ -952,7 +1027,7 @@ class Guild(Hashable):
             The list of invites that are currently active.
         """
 
-        data = yield from self._state.http.invites_from(self.id)
+        data = await self._state.http.invites_from(self.id)
         result = []
         for invite in data:
             channel = self.get_channel(int(invite['channel']['id']))
@@ -962,23 +1037,26 @@ class Guild(Hashable):
 
         return result
 
-    @asyncio.coroutine
-    def create_custom_emoji(self, *, name, image, reason=None):
-        """|coro|
+    async def create_custom_emoji(self, *, name, image, roles=None, reason=None):
+        r"""|coro|
 
         Creates a custom :class:`Emoji` for the guild.
 
-        There is currently a limit of 50 local emotes per guild.
+        There is currently a limit of 50 static and animated emojis respectively per guild,
+        unless the guild has the ``MORE_EMOJI`` feature which extends the limit to 200.
 
-        Note that bot accounts can only edit and delete emojis they have created.
+        You must have the :attr:`~Permissions.manage_emojis` permission to
+        do this.
 
         Parameters
         -----------
         name: str
             The emoji name. Must be at least 2 characters.
         image: bytes
-            The *bytes-like* object representing the image data to use.
-            Only JPG and PNG images are supported.
+            The :term:`py:bytes-like object` representing the image data to use.
+            Only JPG, PNG and GIF images are supported.
+        roles: Optional[list[:class:`Role`]]
+            A :class:`list` of :class:`Role`\s that can use this emoji. Leave empty to make it available to everyone.
         reason: Optional[str]
             The reason for creating this emoji. Shows up on the audit log.
 
@@ -996,16 +1074,20 @@ class Guild(Hashable):
         """
 
         img = utils._bytes_to_base64_data(image)
-        data = yield from self._state.http.create_custom_emoji(self.id, name, img, reason=reason)
+        if roles:
+            roles = [role.id for role in roles]
+        data = await self._state.http.create_custom_emoji(self.id, name, img, roles=roles, reason=reason)
         return self._state.store_emoji(self, data)
 
-    @asyncio.coroutine
-    def create_role(self, *, reason=None, **fields):
+    async def create_role(self, *, reason=None, **fields):
         """|coro|
 
         Creates a :class:`Role` for the guild.
 
         All fields are optional.
+
+        You must have the :attr:`~Permissions.manage_roles` permission to
+        do this.
 
         Parameters
         -----------
@@ -1059,21 +1141,20 @@ class Guild(Hashable):
             if key not in valid_keys:
                 raise InvalidArgument('%r is not a valid field.' % key)
 
-        data = yield from self._state.http.create_role(self.id, reason=reason, **fields)
+        data = await self._state.http.create_role(self.id, reason=reason, **fields)
         role = Role(guild=self, data=data, state=self._state)
 
         # TODO: add to cache
         return role
 
-    @asyncio.coroutine
-    def kick(self, user, *, reason=None):
+    async def kick(self, user, *, reason=None):
         """|coro|
 
         Kicks a user from the guild.
 
         The user must meet the :class:`abc.Snowflake` abc.
 
-        You must have :attr:`Permissions.kick_members` permissions to
+        You must have the :attr:`~Permissions.kick_members` permission to
         do this.
 
         Parameters
@@ -1090,17 +1171,16 @@ class Guild(Hashable):
         HTTPException
             Kicking failed.
         """
-        yield from self._state.http.kick(user.id, self.id, reason=reason)
+        await self._state.http.kick(user.id, self.id, reason=reason)
 
-    @asyncio.coroutine
-    def ban(self, user, *, reason=None, delete_message_days=1):
+    async def ban(self, user, *, reason=None, delete_message_days=1):
         """|coro|
 
         Bans a user from the guild.
 
         The user must meet the :class:`abc.Snowflake` abc.
 
-        You must have :attr:`Permissions.ban_members` permissions to
+        You must have the :attr:`~Permissions.ban_members` permission to
         do this.
 
         Parameters
@@ -1120,17 +1200,16 @@ class Guild(Hashable):
         HTTPException
             Banning failed.
         """
-        yield from self._state.http.ban(user.id, self.id, delete_message_days, reason=reason)
+        await self._state.http.ban(user.id, self.id, delete_message_days, reason=reason)
 
-    @asyncio.coroutine
-    def unban(self, user, *, reason=None):
+    async def unban(self, user, *, reason=None):
         """|coro|
 
         Unbans a user from the guild.
 
         The user must meet the :class:`abc.Snowflake` abc.
 
-        You must have :attr:`Permissions.ban_members` permissions to
+        You must have the :attr:`~Permissions.ban_members` permission to
         do this.
 
         Parameters
@@ -1147,10 +1226,9 @@ class Guild(Hashable):
         HTTPException
             Unbanning failed.
         """
-        yield from self._state.http.unban(user.id, self.id, reason=reason)
+        await self._state.http.unban(user.id, self.id, reason=reason)
 
-    @asyncio.coroutine
-    def vanity_invite(self):
+    async def vanity_invite(self):
         """|coro|
 
         Returns the guild's special vanity invite.
@@ -1158,7 +1236,8 @@ class Guild(Hashable):
         The guild must be partnered, i.e. have 'VANITY_URL' in
         :attr:`~Guild.features`.
 
-        You must have :attr:`Permissions.manage_guild` to use this as well.
+        You must have the :attr:`~Permissions.manage_guild` permission to use
+        this as well.
 
         Returns
         --------
@@ -1174,11 +1253,11 @@ class Guild(Hashable):
         """
 
         # we start with { code: abc }
-        payload = yield from self._state.http.get_vanity_code(self.id)
+        payload = await self._state.http.get_vanity_code(self.id)
 
         # get the vanity URL channel since default channels aren't
         # reliable or a thing anymore
-        data = yield from self._state.http.get_invite(payload['code'])
+        data = await self._state.http.get_invite(payload['code'])
 
         payload['guild'] = self
         payload['channel'] = self.get_channel(int(data['channel']['id']))
@@ -1211,7 +1290,7 @@ class Guild(Hashable):
     def audit_logs(self, *, limit=100, before=None, after=None, reverse=None, user=None, action=None):
         """Return an :class:`AsyncIterator` that enables receiving the guild's audit logs.
 
-        You must have :attr:`Permissions.view_audit_logs` permission to use this.
+        You must have the :attr:`~Permissions.view_audit_log` permission to use this.
 
         Parameters
         -----------

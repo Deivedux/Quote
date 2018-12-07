@@ -24,17 +24,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import aiohttp
 import asyncio
 import json
 import time
 import re
 
+import aiohttp
+
 from . import utils
 from .errors import InvalidArgument, HTTPException, Forbidden, NotFound
 from .user import BaseUser, User
 
-__all__ = ('WebhookAdapter', 'AsyncWebhookAdapter', 'RequestsWebhookAdapter', 'Webhook')
+__all__ = ['WebhookAdapter', 'AsyncWebhookAdapter', 'RequestsWebhookAdapter', 'Webhook']
 
 class WebhookAdapter:
     """Base class for all webhook adapters.
@@ -103,12 +104,19 @@ class WebhookAdapter:
         # mocks a ConnectionState for appropriate use for Message
         return BaseUser(state=self, data=data)
 
-    def execute_webhook(self, *, payload, wait=False, file=None):
+    def execute_webhook(self, *, payload, wait=False, file=None, files=None):
         if file is not None:
             multipart = {
                 'file': file,
                 'payload_json': utils.to_json(payload)
             }
+            data = None
+        elif files is not None:
+            multipart = {
+                'payload_json': utils.to_json(payload)
+            }
+            for i, file in enumerate(files, start=1):
+                multipart['file%i' % i] = file
             data = None
         else:
             data = payload
@@ -135,8 +143,7 @@ class AsyncWebhookAdapter(WebhookAdapter):
         self.session = session
         self.loop = session.loop
 
-    @asyncio.coroutine
-    def request(self, verb, url, payload=None, multipart=None):
+    async def request(self, verb, url, payload=None, multipart=None):
         headers = {}
         data = None
         if payload:
@@ -144,17 +151,16 @@ class AsyncWebhookAdapter(WebhookAdapter):
             data = utils.to_json(payload)
 
         if multipart:
-            file = multipart.pop('file', None)
             data = aiohttp.FormData()
-            if file:
-                data.add_field('file', file[1], filename=file[0], content_type=file[2])
             for key, value in multipart.items():
-                data.add_field(key, value)
+                if key.startswith('file'):
+                    data.add_field(key, value[1], filename=value[0], content_type=value[2])
+                else:
+                    data.add_field(key, value)
 
         for tries in range(5):
-            r = yield from self.session.request(verb, url, headers=headers, data=data)
-            try:
-                data = yield from r.text(encoding='utf-8')
+            async with self.session.request(verb, url, headers=headers, data=data) as r:
+                data = await r.text(encoding='utf-8')
                 if r.headers['Content-Type'] == 'application/json':
                     data = json.loads(data)
 
@@ -162,7 +168,7 @@ class AsyncWebhookAdapter(WebhookAdapter):
                 remaining = r.headers.get('X-Ratelimit-Remaining')
                 if remaining == '0' and r.status != 429:
                     delta = utils._parse_ratelimit_header(r)
-                    yield from asyncio.sleep(delta, loop=self.loop)
+                    await asyncio.sleep(delta, loop=self.loop)
 
                 if 300 > r.status >= 200:
                     return data
@@ -170,11 +176,11 @@ class AsyncWebhookAdapter(WebhookAdapter):
                 # we are being rate limited
                 if r.status == 429:
                     retry_after = data['retry_after'] / 1000.0
-                    yield from asyncio.sleep(retry_after, loop=self.loop)
+                    await asyncio.sleep(retry_after, loop=self.loop)
                     continue
 
                 if r.status in (500, 502):
-                    yield from asyncio.sleep(1 + tries * 2, loop=self.loop)
+                    await asyncio.sleep(1 + tries * 2, loop=self.loop)
                     continue
 
                 if r.status == 403:
@@ -183,12 +189,9 @@ class AsyncWebhookAdapter(WebhookAdapter):
                     raise NotFound(r, data)
                 else:
                     raise HTTPException(r, data)
-            finally:
-                yield from r.release()
 
-    @asyncio.coroutine
-    def handle_execution_response(self, response, *, wait):
-        data = yield from response
+    async def handle_execution_response(self, response, *, wait):
+        data = await response
         if not wait:
             return data
 
@@ -227,7 +230,7 @@ class RequestsWebhookAdapter(WebhookAdapter):
             data = utils.to_json(payload)
 
         if multipart is not None:
-            data = { 'payload_json': multipart.pop('payload_json') }
+            data = {'payload_json': multipart.pop('payload_json')}
 
         for tries in range(5):
             r = self.session.request(verb, url, headers=headers, data=data, files=multipart)
@@ -530,7 +533,7 @@ class Webhook:
         name: Optional[str]
             The webhook's new default name.
         avatar: Optional[bytes]
-            A *bytes-like* object representing the webhook's new default avatar.
+            A :term:`py:bytes-like object` representing the webhook's new default avatar.
 
         Raises
         -------
@@ -565,8 +568,8 @@ class Webhook:
 
         return self._adapter.edit_webhook(**payload)
 
-    def send(self, content=None, *, wait=False, username=None, avatar_url=None,
-                                    tts=False, file=None, embed=None, embeds=None):
+    def send(self, content=None, *, wait=False, username=None, avatar_url=None, tts=False,
+                                    file=None, files=None, embed=None, embeds=None):
         """|maybecoro|
 
         Sends a message using the webhook.
@@ -600,7 +603,10 @@ class Webhook:
         tts: bool
             Indicates if the message should be sent using text-to-speech.
         file: :class:`File`
-            The file to upload.
+            The file to upload. This cannot be mixed with ``files`` parameter.
+        files: List[:class:`File`]
+            A list of files to send with the content. This cannot be mixed with the
+            ``file`` parameter.
         embed: :class:`Embed`
             The rich embed for the content to send. This cannot be mixed with
             ``embeds`` parameter.
@@ -628,6 +634,8 @@ class Webhook:
 
         payload = {}
 
+        if files is not None and file is not None:
+            raise InvalidArgument('Cannot mix file and files keyword arguments.')
         if embeds is not None and embed is not None:
             raise InvalidArgument('Cannot mix embed and embeds keyword arguments.')
 
@@ -654,6 +662,14 @@ class Webhook:
                 return self._adapter.execute_webhook(wait=wait, file=to_pass, payload=payload)
             finally:
                 file.close()
+        elif files is not None:
+            try:
+                to_pass = [(file.filename, file.open_file(), 'application/octet-stream')
+                           for file in files]
+                return self._adapter.execute_webhook(wait=wait, files=to_pass, payload=payload)
+            finally:
+                for file in files:
+                    file.close()
         else:
             return self._adapter.execute_webhook(wait=wait, payload=payload)
 
