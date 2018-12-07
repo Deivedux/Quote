@@ -38,10 +38,12 @@
 > Filled out the `config.json`? Alright, to launch the bot, all you have to do is press `Launch`. *Refer to GIFs below.*
 
 > Downloading:
+
 ![](https://i.imgur.com/KUJFu1a.gif)
 
 
 > Launching:
+
 ![](https://i.imgur.com/Whn2DQg.gif)
 
 
