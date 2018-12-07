@@ -1,5 +1,6 @@
 import discord
 import sqlite3
+import json
 from discord.ext import commands
 
 conn = sqlite3.connect('configs/QuoteBot.db')
