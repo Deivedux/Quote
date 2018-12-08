@@ -39,9 +39,10 @@ class BotLog:
 					else:
 						high_latency.append('Shard #' + str(i[0]) + ' | Check: ' + str(len(outages[i[0]])) + '/3')
 
-			async with aiohttp.ClientSession() as session:
-				webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
-				await webhook.send(content = '\n'.join(high_latency))
+			if len(high_latency) > 0:
+				async with aiohttp.ClientSession() as session:
+					webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
+					await webhook.send(content = '\n'.join(high_latency))
 
 			await asyncio.sleep(60)
 
