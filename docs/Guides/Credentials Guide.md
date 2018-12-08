@@ -14,8 +14,8 @@
 
 > `botlog_webhook_url`, this is the URL of the webhook in a bot log channel. The webhook will announce when a guild is added/removed. *See how to get Webook URL in the GIF below*
 
-> `anti_bot_farm`, this is where you modify options of the Quote's auto leave from bot farming servers. To enable it, replace `false` with `true`. Under `options`, you'll see 2 different types of numbers. `min_member_count` is the count of how many members there are in a server. `min_bot_rate` is the rate in percentage.
-If a server has less than `x` (default `20`) members or if the bots make up to `x` (default `70.0`) percent of the server population, the bot will leave automatically.
+> `anti_bot_farm`, this is where you modify options of the Quote's auto leave from bot farming servers. To enable it, replace `false` with `true`. Under `leave_guild_if`, you'll see 2 different types of numbers. `min_member_count` is the count of how many members there are in a server. `min_bot_rate` is the rate in percentage.
+If a server has less than `x` (default `20`) members and if the bots make up to `x` (default `70.0`) percent of the server population, the bot will leave automatically.
 
 > Getting Token
 
