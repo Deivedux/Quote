@@ -37,7 +37,7 @@ If a server has less than `x` (default `20`) members or if the bots make up to `
 
 > Right click on `config.json` and click on **Open With Notepad++**.
 
-> Fill out the fields, refer to [explanation of features](#Explanation Of Features).
+> Fill out the fields, refer to [explanation of features](#explanation-of-features).
 
 > Once you're done, save by pressing `CTRL + S`.
 
