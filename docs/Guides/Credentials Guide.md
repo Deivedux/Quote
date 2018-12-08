@@ -1,13 +1,10 @@
-# Windows
+# Requirements
 
+> Notepad++ (Or some other decent text editing software.)
 
---
+---
 
-# Linux
-
-> Head to the configs folder by typing `cd Quote/configs`
-
-> To edit `config.json`, type `nano config.json`
+# Explanation Of Features
 
 > `token`, enter your bot token which can be found at [Discord Developers Page](https://discordapp.com/developers/applications/me). *See  GIF below.*
 
@@ -28,3 +25,47 @@
 > Webook URL
 
 ![](https://i.imgur.com/0tLfE1M.gif)
+
+---
+
+# Windows
+
+> Head to the configs folder.
+
+> Right click on `config.json` and click on **Open With Notepad++**.
+
+> Fill out the fields, refer to [explanation of features](#Explanation Of Features).
+
+> Once you're done, save by pressing `CTRL + S`.
+
+> You can now launch the bot from the Windows installer. Enjoy.
+
+---
+
+# Linux
+
+## Via Nano
+
+> Head to the configs folder by typing `cd Quote/configs`
+
+> To edit `config.json`, type `nano config.json`
+
+> Fill out the fields, refer to [explanation of features](#Explanation Of Features).
+
+> Once you're done, save by pressing `CTRL + X`.
+
+> It will prompt you whether you want to save. Press `Y` to accept.
+
+> You can now launch the bot from the `launcher_linux.sh`. Enjoy.
+
+## Via FTP
+
+> Head to the configs folder.
+
+> Right click on `config.json` and click on **Open With Notepad++**.
+
+> Fill out the fields, refer to [explanation of features](#Explanation Of Features).
+
+> Once you're done, save by pressing `CTRL + S`.
+
+> You can now launch the bot from the Windows installer. Enjoy.
