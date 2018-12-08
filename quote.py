@@ -44,6 +44,12 @@ if len(response_json['botlog_webhook_url']) > 0 and response_json['botlog_webhoo
 	except Exception as e:
 		print(e)
 
+if response_json['anti_bot_farm']['enabled'] == True:
+	try:
+		bot.load_extension('cogs.AntiFarm')
+	except Exception as e:
+		print(e)
+
 del response_json
 
 @bot.event
@@ -52,58 +58,9 @@ async def on_ready():
 	print(bot.user.name)
 	print('------------')
 
-	for guild in bot.guilds:
-		if len(guild.members) > 20:
-			bots = []
-			for member in guild.members:
-				if member.bot:
-					bots.append(member)
-			result = len(bots) / len(guild.members) * 100
-			if float(result) > 70.0:
-				await guild.leave()
-
 	while True:
 		await bot.change_presence(status = discord.Status.online, activity = discord.Activity(name = 'messages in ' + str(len(bot.guilds)) + ' servers', type = 3))
 		await asyncio.sleep(120)
-
-# The 3 events below are bot-farm checks.
-# The bot leaves the server if BOTH conditions are met:
-# • more than 20 total members
-# • more than 70% of them are bots
-@bot.event
-async def on_guild_join(guild):
-	if len(guild.members) > 20:
-		bots = []
-		for member in guild.members:
-			if member.bot:
-				bots.append(member)
-		result = len(bots) / len(guild.members) * 100
-		if float(result) > 70.0:
-			await guild.leave()
-
-@bot.event
-async def on_member_join(member):
-	if len(member.guild.members) > 20:
-		bots = []
-		for member in member.guild.members:
-			if member.bot:
-				bots.append(member)
-		result = len(bots) / len(member.guild.members) * 100
-		if float(result) > 70.0:
-			await member.guild.leave()
-
-@bot.event
-async def on_member_remove(member):
-	if len(member.guild.members) > 20:
-		bots = []
-		for member in member.guild.members:
-			if member.bot:
-				bots.append(member)
-		result = len(bots) / len(member.guild.members) * 100
-		if float(result) > 70.0:
-			await member.guild.leave()
-
-# END OF BOT-FARM CHECKS
 
 @bot.event
 async def on_message(message):
