@@ -6,7 +6,7 @@
 
 **[Notepad++](https://notepad-plus-plus.org/repository/7.x/7.6/npp.7.6.Installer.exe)** - Or any decent text editor.
 
-
+---
 
 # Installing Requirements
 
@@ -24,6 +24,7 @@
 
 ![](https://cdn.discordapp.com/attachments/452488096345358346/520734729033613313/unknown.png)
 
+---
 
 # Installing Quote
 
@@ -46,32 +47,7 @@
 
 ![](https://i.imgur.com/Whn2DQg.gif)
 
-
-
-# Editing Credentials
-
-> Head to `configs` folder and right click on `config.json`
-
-> Edit it with Notepad++ or any decent text editing software you have. (Visual Studio Code, Atom, etc.)
-
-> Under `Token`, insert your bot's token which can be found on the [Discord developers page](https://discordapp.com/developers/applications/me). *Refer to GIF below.*
-
-> Once you've filled out the token, now it's time to edit the `owner_ids`. *Refer to GIF below.*
-
-> Token:
-
-![](http://i.imgur.com/jaxgi2P.gif)
-
-
-> Owner IDs:
-
-![](http://i.imgur.com/UQxBZfJ.gif)
-
-
-> After you found out your owner ID and copied it, your `config.json` should look something like this.
-
-![](https://i.imgur.com/MHjaCqh.png)
-
+---
 
 # Inviting Your Bot
 
@@ -83,7 +59,7 @@
 
 > After that, you're all set. If you have any questions, ask in the [Official Support Server](https://discord.gg/sbySHxA).
 
-
+---
 
 # Errors
 
