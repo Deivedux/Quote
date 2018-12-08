@@ -29,15 +29,15 @@ class AntiFarm:
 
 	async def on_member_join(self, member):
 		if member.guild.member_count > farm_conditions['min_member_count']:
-			bots = [member for member in guild.members if member.bot]
-			result = (len(bots) / guild.member_count) * 100
+			bots = [member for member in member.guild.members if member.bot]
+			result = (len(bots) / member.guild.member_count) * 100
 			if result > farm_conditions['min_bot_rate']:
 				await guild.leave()
 
 	async def on_member_remove(self, member):
 		if member.guild.member_count > farm_conditions['min_member_count']:
-			bots = [member for member in guild.members if member.bot]
-			result = (len(bots) / guild.member_count) * 100
+			bots = [member for member in member.guild.members if member.bot]
+			result = (len(bots) / member.guild.member_count) * 100
 			if result > farm_conditions['min_bot_rate']:
 				await guild.leave()
 
