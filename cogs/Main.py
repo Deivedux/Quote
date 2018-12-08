@@ -47,6 +47,10 @@ class Main:
 	def __init__(self, bot):
 		self.bot = bot
 
+	async def on_guild_remove(self, guild):
+		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
+		conn.commit()
+
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '💬' and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
 			guild = self.bot.get_guild(payload.guild_id)
