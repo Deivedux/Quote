@@ -4,7 +4,7 @@
 
 > **Git**
 
-
+---
 
 # Installing Requirements
 
@@ -14,7 +14,7 @@ apt install git
 apt install python3
 ```
 
-
+---
 
 # Installing Quote
 
@@ -22,13 +22,13 @@ apt install python3
 
 > Next step is editing the credentials.
 
-
+---
 
 # Editing Credentials
 
 > Refer to [Credentials Guide](Guides/Credentials Guide.md).
 
-
+---
 
 # Inviting Your Bot
 
