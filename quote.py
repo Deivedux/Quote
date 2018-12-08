@@ -17,7 +17,6 @@ with open('configs/config.json') as json_data:
 
 default_prefix = response_json['default_prefix']
 token = response_json['token']
-owners = response_json['owner_ids']
 
 async def get_prefix(bot, message):
 	if message.guild:
@@ -105,14 +104,6 @@ async def on_member_remove(member):
 			await member.guild.leave()
 
 # END OF BOT-FARM CHECKS
-
-# Bot owners are able to add 🗑 reaction to own bot
-# messages to delete themselves.
-# Only works with cached messages.
-@bot.event
-async def on_reaction_add(reaction, user):
-	if reaction.emoji == '🗑' and user.id in owners and reaction.message.author == bot.user:
-		await reaction.message.delete()
 
 @bot.event
 async def on_message(message):
