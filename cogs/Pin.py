@@ -80,10 +80,10 @@ class Pin:
 				return await ctx.send(content = error_string + ' **Make sure I have all of the following permissions in that channel before enabling pins:\n• Read Messages\n• Read Message History\n• Send Messages\n• Embed Links**')
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", '" + str(channel.id) + "')")
+				c.execute("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", " + str(channel.id) + ")")
 				conn.commit()
 			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET PinChannel = '" + str(channel.id) + "' WHERE Guild = " + str(ctx.guild.id))
+				c.execute("UPDATE ServerConfig SET PinChannel = " + str(channel.id) + " WHERE Guild = " + str(ctx.guild.id))
 				conn.commit()
 			pin_channels[ctx.guild.id] = channel.id
 
