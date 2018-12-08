@@ -47,6 +47,10 @@ class Main:
 	def __init__(self, bot):
 		self.bot = bot
 
+	async def on_ready(self):
+		c.execute("DELETE FROM ServerConfig WHERE Guild NOT IN (" + ', '.join([str(guild.id) for guild in self.bot.guilds]) + ")")
+		conn.commit()
+
 	async def on_guild_remove(self, guild):
 		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
 		conn.commit()
@@ -167,7 +171,7 @@ class Main:
 		if ctx.guild.id not in del_commands:
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, DelCommands) VALUES ('" + str(ctx.guild.id) + "', '1')")
+				c.execute("INSERT INTO ServerConfig (Guild, DelCommands) VALUES (" + str(ctx.guild.id) + ", '1')")
 				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET DelCommands = '1' WHERE Guild = " + str(ctx.guild.id))
@@ -192,7 +196,7 @@ class Main:
 		if ctx.guild.id not in on_reaction:
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, OnReaction) VALUES ('" + str(ctx.guild.id) + "', '1')")
+				c.execute("INSERT INTO ServerConfig (Guild, OnReaction) VALUES (" + str(ctx.guild.id) + ", '1')")
 				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET OnReaction = '1' WHERE Guild = " + str(ctx.guild.id))
