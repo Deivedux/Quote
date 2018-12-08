@@ -1,6 +1,7 @@
 {
 	"token": "",
 	"default_prefix": ">",
+	"botlog_webhook_url": "",
 	"response_string": {
 		"success": ":white_check_mark:",
 		"error": ":x:"

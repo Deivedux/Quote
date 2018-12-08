@@ -18,7 +18,6 @@ with open('configs/config.json') as json_data:
 default_prefix = response_json['default_prefix']
 token = response_json['token']
 owners = response_json['owner_ids']
-del response_json
 
 async def get_prefix(bot, message):
 	if message.guild:
@@ -39,6 +38,14 @@ for cog in startup_extensions:
 		bot.load_extension(cog)
 	except Exception as e:
 		print(e)
+
+if len(response_json['botlog_webhook_url']) > 0 and response_json['botlog_webhook_url'].startswith('https://discordapp.com/api/webhooks/'):
+	try:
+		bot.load_extension('cogs.BotLog')
+	except Exception as e:
+		print(e)
+
+del response_json
 
 @bot.event
 async def on_ready():
