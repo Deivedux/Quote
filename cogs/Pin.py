@@ -26,11 +26,8 @@ class Pin:
 
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '📌':
-			try:
-				channel = self.bot.get_channel(pin_channels[payload.guild_id])
-			except KeyError:
-				return
-			except discord.NotFound:
+			channel = self.bot.get_channel(pin_channels[payload.guild_id])
+			if not channel:
 				c.execute("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(payload.guild_id))
 				conn.commit()
 				del pin_channels[payload.guild_id]
