@@ -14,7 +14,7 @@ choice=4
 while [ "$choice" = "4" ]; do
 read choice
 if [ "$choice" = "1" ] ; then
-	run_bot
+	run_bot()
 else
 	if [ "$choice" = "2" ] ; then
 		echo "Starting the bot with auto-restart. Please wait..."
