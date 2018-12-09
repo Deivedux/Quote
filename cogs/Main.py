@@ -162,7 +162,7 @@ class Main:
 				conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
-			await ctx.send(content = success_string + ' **Prefix changed to `' + prefix + '`.**')
+			await ctx.send(content = success_string + ' **Prefix changed to** `' + prefix + '`')
 
 	@commands.command(aliases = ['delcmds'])
 	async def delcommands(self, ctx):
