@@ -12,11 +12,22 @@ with open('configs/config.json') as json_data:
 
 owners = response_json['owner_ids']
 success_string = response_json['response_string']['success']
+error_string = response_json['response_string']['error']
 del response_json
 
 class Owneronly:
 	def __init__(self, bot):
 		self.bot = bot
+
+	@commands.command()
+	async def leave(self, ctx, guild_id: int):
+		if ctx.author.id in owners:
+			guild = self.bot.get_guild(guild_id)
+			if guild:
+				await guild.leave()
+				await ctx.send(content = success_string + ' **Successfully left guild.**')
+			else:
+				await ctx.send(content = error_string + ' **No such server found.**')
 
 	@commands.command()
 	async def shutdown(self, ctx):
