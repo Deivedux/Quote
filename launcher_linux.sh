@@ -14,9 +14,17 @@ choice=4
 while [ "$choice" = "4" ]; do
 read choice
 if [ "$choice" = "1" ] ; then
-	run_bot
+	echo ""
+	echo "Getting requirements."
+	sleep 5s
+	curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh | sh
+	echo ""
+	echo "Done!"
+	echo "Starting Bot..."
+	python3 quote.py
 else
 	if [ "$choice" = "2" ] ; then
+			curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh | sh
         	echo "Starting the bot with auto-restart.."
             	sh autorestart_linux.sh
 		exit 1
