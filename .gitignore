@@ -1,4 +1,3 @@
-*.db
-config.json
+configs/*.db
 cogs/__pycache__
 discord/__pycache__
