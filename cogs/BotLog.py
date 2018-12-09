@@ -26,18 +26,18 @@ class BotLog:
 			high_latency = []
 			for i in [(i[0], round(i[1] * 1000)) for i in self.bot.latencies]:
 				if i[1] > 1000:
-					outages[i[0]] = []
+					outages[i[0]] = 0
 					high_latency.append(':name_badge: **Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms**')
-				elif i[1] > 400:
-					outages[i[0]] = []
+				elif i[1] > 500:
+					outages[i[0]] = 0
 					high_latency.append(':warning: **Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms**')
 				elif i[1] in outages.keys():
-					outages[i[0]].append(i[1])
-					if len(outages[i[0]]) == 3:
+					outages[i[0]] = outages[i[0]] + 1
+					if outages[i[0]] == 3:
 						del outages[i[0]]
-						high_latency.append('Shard #' + str(i[0]) + ' | Check: ' + str(len(outages[i[0]])) + '/3 (successfully recovered)')
+						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3 (successfully recovered)')
 					else:
-						high_latency.append('Shard #' + str(i[0]) + ' | Check: ' + str(len(outages[i[0]])) + '/3')
+						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3')
 
 			if len(high_latency) > 0:
 				async with aiohttp.ClientSession() as session:

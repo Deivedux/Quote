@@ -25,18 +25,19 @@ class Pin:
 		self.bot = bot
 
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '📌':
+		if str(payload.emoji) == '📌' and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot:
+			guild = self.bot.get_guild(payload.guild_id)
 			try:
-				channel = self.bot.get_channel(pin_channels[payload.guild_id])
+				channel = guild.get_channel(pin_channels[payload.guild_id])
 			except KeyError:
 				return
-			except discord.NotFound:
-				c.execute("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(payload.guild_id))
-				conn.commit()
-				del pin_channels[payload.guild_id]
-				return
+			else:
+				if not channel:
+					c.execute("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(payload.guild_id))
+					conn.commit()
+					del pin_channels[payload.guild_id]
+					return
 
-			guild = self.bot.get_guild(payload.guild_id)
 			user = guild.get_member(payload.user_id)
 			pin_channel = self.bot.get_channel(payload.channel_id)
 			if not user.permissions_in(pin_channel).manage_messages:

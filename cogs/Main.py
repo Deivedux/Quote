@@ -25,6 +25,7 @@ del server_config_raw
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 
+default_prefix = response_json['default_prefix']
 success_string = response_json['response_string']['success']
 error_string = response_json['response_string']['error']
 del response_json
@@ -141,9 +142,9 @@ class Main:
 			try:
 				guild_prefix = prefixes[ctx.guild.id]
 			except KeyError:
-				guild_prefix = '>'
+				guild_prefix = default_prefix
 
-			await ctx.send(content = '**My prefix here is `' + guild_prefix + '`.**')
+			await ctx.send(content = '**My prefix here is** `' + guild_prefix + '`')
 
 		else:
 
@@ -161,7 +162,7 @@ class Main:
 				conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
-			await ctx.send(content = success_string + ' **Prefix changed to `' + prefix + '`.**')
+			await ctx.send(content = success_string + ' **Prefix changed to** `' + prefix + '`')
 
 	@commands.command(aliases = ['delcmds'])
 	async def delcommands(self, ctx):
@@ -178,7 +179,7 @@ class Main:
 				conn.commit()
 			del_commands.append(ctx.guild.id)
 
-			await ctx.send(content = success_string + ' **Auto-delete of quote command enabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote commands enabled.**')
 
 		else:
 
@@ -186,7 +187,7 @@ class Main:
 			conn.commit()
 			del_commands.remove(ctx.guild.id)
 
-			await ctx.send(content = success_string + ' **Auto-delete of quote command disabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote commands disabled.**')
 
 	@commands.command()
 	async def reactions(self, ctx):
