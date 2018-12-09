@@ -9,7 +9,7 @@ choice=4
 	echo "3-- Update to latest version"
 	echo "4-- Update to stable version"
 	echo ""
-	echo -e "• You have been given pre-ready publicly accessible program's code that already strictly follows Discord's API Terms of Service (https://discordapp.com/developers/docs/legal)./n• You are free to modify the code to your own likings, but failure to accept the license agreement(https://github.com/Deivedux/Quote/blob/master/LICENSE) will result in a blacklist from the official bot, a ban from it's official Discord server, and a possible flag on your GitHib account.\n• If you are planning on injecting malicious code into your copy of the program, you are risking a ban on your bot account, and a possible Discord account termination under Discord Staff discretion.If you will be found not banned yet, then the above punishments will apply.\n\nBy self hosting, you agree to all of the above terms."
+	echo -e "• You have been given pre-ready publicly accessible program's code that already strictly follows Discord's API Terms of Service (https://discordapp.com/developers/docs/legal).\n• You are free to modify the code to your own likings, but failure to accept the license agreement(https://github.com/Deivedux/Quote/blob/master/LICENSE) will result in a blacklist from the official bot, a ban from it's official Discord server, and a possible flag on your GitHib account.\n• If you are planning on injecting malicious code into your copy of the program, you are risking a ban on your bot account, and a possible Discord account termination under Discord Staff discretion.If you will be found not banned yet, then the above punishments will apply.\n\nBy self hosting, you agree to all of the above terms."
 
 while [ "$choice" = "4" ]; do
 read choice
@@ -91,7 +91,7 @@ run_bot() {
 	      		echo "Failed to install requirements!"
       			exit 254
     		fi
-  	elif hash python 2>/dev/null; then
+  	else hash python 2>/dev/null; then
 		case "$(python --version 2>&1)" in
 		*" 3."*)
 			echo ""
