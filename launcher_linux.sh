@@ -91,7 +91,7 @@ run_bot() {
 	      		echo "Failed to install requirements!"
       			exit 254
     		fi
-  	else hash python 2>/dev/null; then
+  	elif hash python 2>/dev/null; then
 		case "$(python --version 2>&1)" in
 		*" 3."*)
 			echo ""
