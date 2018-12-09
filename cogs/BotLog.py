@@ -28,7 +28,7 @@ class BotLog:
 				if i[1] > 1000:
 					outages[i[0]] = 0
 					high_latency.append(':name_badge: **Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms**')
-				elif i[1] > 400:
+				elif i[1] > 500:
 					outages[i[0]] = 0
 					high_latency.append(':warning: **Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms**')
 				elif i[1] in outages.keys():
