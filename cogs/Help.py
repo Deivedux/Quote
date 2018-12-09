@@ -21,6 +21,9 @@ class Help:
 		except KeyError:
 			guild_prefix = default_prefix
 
+		with open('commands.json') as json_data:
+			commands_json = json.load(json_data)
+
 		if not command:
 
 			embed = discord.Embed(color = 0x08FF00)
@@ -30,9 +33,6 @@ class Help:
 			await ctx.send(embed = embed)
 
 		else:
-
-			with open('commands.json') as json_data:
-				commands_json = json.load(json_data)
 
 			try:
 				command_help = commands_json[command.lower()]
