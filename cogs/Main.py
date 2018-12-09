@@ -178,7 +178,7 @@ class Main:
 				conn.commit()
 			del_commands.append(ctx.guild.id)
 
-			await ctx.send(content = success_string + ' **Auto-delete of quote command enabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote commands enabled.**')
 
 		else:
 
@@ -186,7 +186,7 @@ class Main:
 			conn.commit()
 			del_commands.remove(ctx.guild.id)
 
-			await ctx.send(content = success_string + ' **Auto-delete of quote command disabled.**')
+			await ctx.send(content = success_string + ' **Auto-delete of quote commands disabled.**')
 
 	@commands.command()
 	async def reactions(self, ctx):
