@@ -1,11 +1,7 @@
 import discord
 import json
-import sqlite3
 from io import StringIO
 from discord.ext import commands
-
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
