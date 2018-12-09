@@ -25,6 +25,7 @@ del server_config_raw
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
 
+default_prefix = response_json['default_prefix']
 success_string = response_json['response_string']['success']
 error_string = response_json['response_string']['error']
 del response_json
@@ -141,9 +142,9 @@ class Main:
 			try:
 				guild_prefix = prefixes[ctx.guild.id]
 			except KeyError:
-				guild_prefix = '>'
+				guild_prefix = default_prefix
 
-			await ctx.send(content = '**My prefix here is `' + guild_prefix + '`.**')
+			await ctx.send(content = '**My prefix here is** `' + guild_prefix + '`')
 
 		else:
 
