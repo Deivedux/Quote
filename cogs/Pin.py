@@ -25,7 +25,7 @@ class Pin:
 		self.bot = bot
 
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '📌':
+		if str(payload.emoji) == '📌' and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot:
 			guild = self.bot.get_guild(payload.guild_id)
 			try:
 				channel = guild.get_channel(pin_channels[payload.guild_id])
