@@ -10,9 +10,6 @@ default_prefix = response_json['default_prefix']
 error_string = response_json['response_string']['error']
 del response_json
 
-with open('commands.json') as json_data:
-	commands_json = json.load(json_data)
-
 class Help:
 	def __init__(self, bot):
 		self.bot = bot
@@ -33,6 +30,9 @@ class Help:
 			await ctx.send(embed = embed)
 
 		else:
+
+			with open('commands.json') as json_data:
+				commands_json = json.load(json_data)
 
 			try:
 				command_help = commands_json[command.lower()]
