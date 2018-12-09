@@ -1,4 +1,4 @@
-[![Support Server](https://discordapp.com/api/guilds/418455732741079040/widget.png)](https://discord.gg/sbySHxA)
+[![Support Server](https://discordapp.com/api/guilds/418455732741079040/widget.png?style=shield)](https://discord.gg/sbySHxA)
 [![Quote Bot](https://discordbots.org/api/widget/status/447176783704489985.svg)](https://discordbots.org/bot/447176783704489985)
 
 # Stop self-botting, quote messages the legal way
