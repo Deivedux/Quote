@@ -18,7 +18,7 @@ Describe the bug you've found and steps on reproducing it as detailed as you can
 
 # Discord server
 
-If you are not already a part of the [Official Support Server](https://discord.gg/SDAbTsr), join it.
+If you are not already a part of the [Official Support Server](https://discord.gg/sbySHxA), join it.
 
 Report bugs in the #bugs channel.
 

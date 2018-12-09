@@ -5,6 +5,7 @@ pages:
 - Hosting Guides:
     - Windows Guide: Guides/Windows Guide.md
     - Linux Guide: Guides/Linux Guide.md
+    - Credentials Guide: Guides/Credentials Guide.md
 - Other Guides:
     - Bug Reporting: Guides/Reporting Bugs.md
 

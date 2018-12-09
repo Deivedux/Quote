@@ -45,7 +45,11 @@ import logging
 import struct
 import threading
 
-log = logging.getLogger(__name__)
+from . import opus
+from .backoff import ExponentialBackoff
+from .gateway import *
+from .errors import ClientException, ConnectionClosed
+from .player import AudioPlayer, AudioSource
 
 try:
     import nacl.secret
@@ -53,11 +57,8 @@ try:
 except ImportError:
     has_nacl = False
 
-from . import opus
-from .backoff import ExponentialBackoff
-from .gateway import *
-from .errors import ClientException, ConnectionClosed
-from .player import AudioPlayer, AudioSource
+
+log = logging.getLogger(__name__)
 
 class VoiceClient:
     """Represents a Discord voice connection.
@@ -129,32 +130,29 @@ class VoiceClient:
 
     # connection related
 
-    @asyncio.coroutine
-    def start_handshake(self):
+    async def start_handshake(self):
         log.info('Starting voice handshake...')
 
-        key_id, key_name = self.channel._get_voice_client_key()
         guild_id, channel_id = self.channel._get_voice_state_pair()
         state = self._state
         self.main_ws = ws = state._get_websocket(guild_id)
         self._connections += 1
 
         # request joining
-        yield from ws.voice_state(guild_id, channel_id)
+        await ws.voice_state(guild_id, channel_id)
 
         try:
-            yield from asyncio.wait_for(self._handshake_complete.wait(), timeout=self.timeout, loop=self.loop)
-        except asyncio.TimeoutError as e:
-            yield from self.terminate_handshake(remove=True)
-            raise e
+            await asyncio.wait_for(self._handshake_complete.wait(), timeout=self.timeout, loop=self.loop)
+        except asyncio.TimeoutError:
+            await self.terminate_handshake(remove=True)
+            raise
 
         log.info('Voice handshake complete. Endpoint found %s (IP: %s)', self.endpoint, self.endpoint_ip)
 
-    @asyncio.coroutine
-    def terminate_handshake(self, *, remove=False):
+    async def terminate_handshake(self, *, remove=False):
         guild_id, channel_id = self.channel._get_voice_state_pair()
         self._handshake_complete.clear()
-        yield from self.main_ws.voice_state(guild_id, None, self_mute=True)
+        await self.main_ws.voice_state(guild_id, None, self_mute=True)
 
         log.info('The voice handshake is being terminated for Channel ID %s (Guild ID %s)', channel_id, guild_id)
         if remove:
@@ -162,8 +160,7 @@ class VoiceClient:
             key_id, _ = self.channel._get_voice_client_key()
             self._state._remove_voice_client(key_id)
 
-    @asyncio.coroutine
-    def _create_socket(self, server_id, data):
+    async def _create_socket(self, server_id, data):
         self._connected.clear()
         self.session_id = self.main_ws.session_id
         self.server_id = server_id
@@ -181,7 +178,7 @@ class VoiceClient:
         if self.socket:
             try:
                 self.socket.close()
-            except:
+            except Exception:
                 pass
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -190,13 +187,12 @@ class VoiceClient:
         if self._handshake_complete.is_set():
             # terminate the websocket and handle the reconnect loop if necessary.
             self._handshake_complete.clear()
-            yield from self.ws.close(4000)
+            await self.ws.close(4000)
             return
 
         self._handshake_complete.set()
 
-    @asyncio.coroutine
-    def connect(self, *, reconnect=True, _tries=0, do_handshake=True):
+    async def connect(self, *, reconnect=True, _tries=0, do_handshake=True):
         log.info('Connecting to voice...')
         try:
             del self.secret_key
@@ -204,56 +200,54 @@ class VoiceClient:
             pass
 
         if do_handshake:
-            yield from self.start_handshake()
+            await self.start_handshake()
 
         try:
-            self.ws = yield from DiscordVoiceWebSocket.from_client(self)
+            self.ws = await DiscordVoiceWebSocket.from_client(self)
             self._connected.clear()
             while not hasattr(self, 'secret_key'):
-                yield from self.ws.poll_event()
+                await self.ws.poll_event()
             self._connected.set()
         except (ConnectionClosed, asyncio.TimeoutError):
             if reconnect and _tries < 5:
                 log.exception('Failed to connect to voice... Retrying...')
-                yield from asyncio.sleep(1 + _tries * 2.0, loop=self.loop)
-                yield from self.terminate_handshake()
-                yield from self.connect(reconnect=reconnect, _tries=_tries + 1)
+                await asyncio.sleep(1 + _tries * 2.0, loop=self.loop)
+                await self.terminate_handshake()
+                await self.connect(reconnect=reconnect, _tries=_tries + 1)
             else:
                 raise
 
         if self._runner is None:
             self._runner = self.loop.create_task(self.poll_voice_ws(reconnect))
 
-    @asyncio.coroutine
-    def poll_voice_ws(self, reconnect):
+    async def poll_voice_ws(self, reconnect):
         backoff = ExponentialBackoff()
         while True:
             try:
-                yield from self.ws.poll_event()
-            except (ConnectionClosed, asyncio.TimeoutError) as e:
-                if isinstance(e, ConnectionClosed):
-                    if e.code == 1000:
-                        yield from self.disconnect()
+                await self.ws.poll_event()
+            except (ConnectionClosed, asyncio.TimeoutError) as exc:
+                if isinstance(exc, ConnectionClosed):
+                    if exc.code == 1000:
+                        await self.disconnect()
                         break
 
                 if not reconnect:
-                    yield from self.disconnect()
-                    raise e
+                    await self.disconnect()
+                    raise
 
                 retry = backoff.delay()
                 log.exception('Disconnected from voice... Reconnecting in %.2fs.', retry)
                 self._connected.clear()
-                yield from asyncio.sleep(retry, loop=self.loop)
-                yield from self.terminate_handshake()
+                await asyncio.sleep(retry, loop=self.loop)
+                await self.terminate_handshake()
                 try:
-                    yield from self.connect(reconnect=True)
+                    await self.connect(reconnect=True)
                 except asyncio.TimeoutError:
                     # at this point we've retried 5 times... let's continue the loop.
                     log.warning('Could not connect to voice... Retrying...')
                     continue
 
-    @asyncio.coroutine
-    def disconnect(self, *, force=False):
+    async def disconnect(self, *, force=False):
         """|coro|
 
         Disconnects this voice client from voice.
@@ -266,15 +260,14 @@ class VoiceClient:
 
         try:
             if self.ws:
-                yield from self.ws.close()
+                await self.ws.close()
 
-            yield from self.terminate_handshake(remove=True)
+            await self.terminate_handshake(remove=True)
         finally:
             if self.socket:
                 self.socket.close()
 
-    @asyncio.coroutine
-    def move_to(self, channel):
+    async def move_to(self, channel):
         """|coro|
 
         Moves you to a different voice channel.
@@ -285,7 +278,7 @@ class VoiceClient:
             The channel to move to. Must be a voice channel.
         """
         guild_id, _ = self.channel._get_voice_state_pair()
-        yield from self.main_ws.voice_state(guild_id, channel.id)
+        await self.main_ws.voice_state(guild_id, channel.id)
 
     def is_connected(self):
         """:class:`bool`: Indicates if the voice client is connected to voice."""
@@ -400,7 +393,7 @@ class VoiceClient:
         Parameters
         ----------
         data: bytes
-            The *bytes-like object* denoting PCM or Opus voice data.
+            The :term:`py:bytes-like object` denoting PCM or Opus voice data.
         encode: bool
             Indicates if ``data`` should be encoded into Opus.
 

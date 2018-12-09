@@ -1,5 +1,6 @@
 import discord
 import sqlite3
+import json
 from discord.ext import commands
 
 conn = sqlite3.connect('configs/QuoteBot.db')
@@ -11,6 +12,13 @@ for i in server_config_raw:
 	if i[3] != None:
 		pin_channels[int(i[0])] = int(i[3])
 del server_config_raw
+
+with open('configs/config.json') as json_data:
+	response_json = json.load(json_data)
+
+success_string = response_json['response_string']['success']
+error_string = response_json['response_string']['error']
+del response_json
 
 class Pin:
 	def __init__(self, bot):
@@ -44,7 +52,7 @@ class Pin:
 
 			if message:
 				async for msg in channel.history(limit = 50):
-					if msg.content.startswith('📌 **Message ID:** ' + str(payload.message_id)):
+					if str(payload.message_id) in msg.content:
 						return
 
 				embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
@@ -69,17 +77,17 @@ class Pin:
 
 			perms = ctx.guild.me.permissions_in(channel)
 			if not perms.read_messages or not perms.read_message_history or not perms.send_messages or not perms.embed_links:
-				return await ctx.send(content = '<:xmark:314349398824058880> **Make sure I have all of the following permissions in that channel before enabling pins:\n• Read Messages\n• Read Message History\n• Send Messages\n• Embed Links**')
+				return await ctx.send(content = error_string + ' **Make sure I have all of the following permissions in that channel before enabling pins:\n• Read Messages\n• Read Message History\n• Send Messages\n• Embed Links**')
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, PinChannel) VALUES ('" + str(ctx.guild.id) + "', '" + str(channel.id) + "')")
+				c.execute("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", " + str(channel.id) + ")")
 				conn.commit()
 			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET PinChannel = '" + str(channel.id) + "' WHERE Guild = " + str(ctx.guild.id))
+				c.execute("UPDATE ServerConfig SET PinChannel = " + str(channel.id) + " WHERE Guild = " + str(ctx.guild.id))
 				conn.commit()
 			pin_channels[ctx.guild.id] = channel.id
 
-			await ctx.send(content = '<:check:314349398811475968> **Pin channel set to ' + channel.mention + '.**')
+			await ctx.send(content = success_string + ' **Pin channel set to ' + channel.mention + '.**')
 
 		else:
 
@@ -87,7 +95,7 @@ class Pin:
 			conn.commit()
 			del pin_channels[ctx.guild.id]
 
-			await ctx.send(content = '<:check:314349398811475968> **Pin channel disabled.**')
+			await ctx.send(content = success_string + ' **Pin channel disabled.**')
 
 
 def setup(bot):

@@ -27,12 +27,12 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 import re
 
-from . import utils, compat
+from . import utils
 from .reaction import Reaction
 from .emoji import Emoji, PartialEmoji
 from .calls import CallMessage
 from .enums import MessageType, try_enum
-from .errors import InvalidArgument, ClientException, HTTPException, NotFound
+from .errors import InvalidArgument, ClientException, HTTPException
 from .embeds import Embed
 
 class Attachment:
@@ -71,8 +71,7 @@ class Attachment:
         self.proxy_url = data.get('proxy_url')
         self._http = state.http
 
-    @asyncio.coroutine
-    def save(self, fp, *, seek_begin=True):
+    async def save(self, fp, *, seek_begin=True):
         """|coro|
 
         Saves this attachment into a file-like object.
@@ -100,7 +99,7 @@ class Attachment:
             The number of bytes written.
         """
 
-        data = yield from self._http.get_attachment(self.url)
+        data = await self._http.get_attachment(self.url)
         if isinstance(fp, str):
             with open(fp, 'wb') as f:
                 return f.write(data)
@@ -111,7 +110,7 @@ class Attachment:
             return written
 
 class Message:
-    """Represents a message from Discord.
+    r"""Represents a message from Discord.
 
     There should be no need to create one of these manually.
 
@@ -124,7 +123,7 @@ class Message:
         in cases where it might be a system message for :attr:`system_content`.
     author
         A :class:`Member` that sent the message. If :attr:`channel` is a
-        private channel, then it is a :class:`User` instead.
+        private channel or the user has the left the guild, then it is a :class:`User` instead.
     content: :class:`str`
         The actual contents of the message.
     nonce
@@ -195,13 +194,13 @@ class Message:
         - ``cover_image``: A string representing the embed's image asset ID.
     """
 
-    __slots__ = ( '_edited_timestamp', 'tts', 'content', 'channel', 'webhook_id',
-                  'mention_everyone', 'embeds', 'id', 'mentions', 'author',
-                  '_cs_channel_mentions', '_cs_raw_mentions', 'attachments',
-                  '_cs_clean_content', '_cs_raw_channel_mentions', 'nonce', 'pinned',
-                  'role_mentions', '_cs_raw_role_mentions', 'type', 'call',
-                  '_cs_system_content', '_cs_guild', '_state', 'reactions',
-                  'application', 'activity' )
+    __slots__ = ('_edited_timestamp', 'tts', 'content', 'channel', 'webhook_id',
+                 'mention_everyone', 'embeds', 'id', 'mentions', 'author',
+                 '_cs_channel_mentions', '_cs_raw_mentions', 'attachments',
+                 '_cs_clean_content', '_cs_raw_channel_mentions', 'nonce', 'pinned',
+                 'role_mentions', '_cs_raw_role_mentions', 'type', 'call',
+                 '_cs_system_content', '_cs_guild', '_state', 'reactions',
+                 'application', 'activity')
 
     def __init__(self, *, state, channel, data):
         self._state = state
@@ -310,7 +309,7 @@ class Message:
         self.role_mentions = []
         if self.guild is not None:
             for role_id in map(int, role_mentions):
-                role = utils.get(self.guild.roles, id=role_id)
+                role = self.guild.get_role(role_id)
                 if role is not None:
                     self.role_mentions.append(role)
 
@@ -367,7 +366,7 @@ class Message:
     def channel_mentions(self):
         if self.guild is None:
             return []
-        it = filter(None, map(lambda m: self.guild.get_channel(m), self.raw_channel_mentions))
+        it = filter(None, map(self.guild.get_channel, self.raw_channel_mentions))
         return utils._unique(it)
 
     @utils.cached_slot_property('_cs_clean_content')
@@ -434,9 +433,15 @@ class Message:
         """Optional[datetime.datetime]: A naive UTC datetime object containing the edited time of the message."""
         return self._edited_timestamp
 
+    @property
+    def jump_url(self):
+        """:class:`str`: Returns a URL that allows the client to jump to this message."""
+        guild_id = getattr(self.guild, 'id', '@me')
+        return 'https://discordapp.com/channels/{0}/{1.channel.id}/{1.id}'.format(guild_id, self)
+
     @utils.cached_slot_property('_cs_system_content')
     def system_content(self):
-        """A property that returns the content that is rendered
+        r"""A property that returns the content that is rendered
         regardless of the :attr:`Message.type`.
 
         In the case of :attr:`MessageType.default`\, this just returns the
@@ -521,8 +526,7 @@ class Message:
             else:
                 return '{0.author.name} started a call \N{EM DASH} Join the call.'.format(self)
 
-    @asyncio.coroutine
-    def delete(self):
+    async def delete(self):
         """|coro|
 
         Deletes the message.
@@ -538,10 +542,9 @@ class Message:
         HTTPException
             Deleting the message failed.
         """
-        yield from self._state.http.delete_message(self.channel.id, self.id)
+        await self._state.http.delete_message(self.channel.id, self.id)
 
-    @asyncio.coroutine
-    def edit(self, **fields):
+    async def edit(self, **fields):
         """|coro|
 
         Edits the message.
@@ -583,7 +586,7 @@ class Message:
             if embed is not None:
                 fields['embed'] = embed.to_dict()
 
-        data = yield from self._state.http.edit_message(self.id, self.channel.id, **fields)
+        data = await self._state.http.edit_message(self.id, self.channel.id, **fields)
         self._update(channel=self.channel, data=data)
 
         try:
@@ -592,22 +595,22 @@ class Message:
             pass
         else:
             if delete_after is not None:
-                @asyncio.coroutine
-                def delete():
-                    yield from asyncio.sleep(delete_after, loop=self._state.loop)
+                async def delete():
+                    await asyncio.sleep(delete_after, loop=self._state.loop)
                     try:
-                        yield from self._state.http.delete_message(self.channel.id, self.id)
-                    except:
+                        await self._state.http.delete_message(self.channel.id, self.id)
+                    except HTTPException:
                         pass
 
-                compat.create_task(delete(), loop=self._state.loop)
+                asyncio.ensure_future(delete(), loop=self._state.loop)
 
-    @asyncio.coroutine
-    def pin(self):
+    async def pin(self):
         """|coro|
 
-        Pins the message. You must have :attr:`~Permissions.manage_messages`
-        permissions to do this in a non-private channel context.
+        Pins the message.
+
+        You must have the :attr:`~Permissions.manage_messages` permission to do
+        this in a non-private channel context.
 
         Raises
         -------
@@ -620,15 +623,16 @@ class Message:
             having more than 50 pinned messages.
         """
 
-        yield from self._state.http.pin_message(self.channel.id, self.id)
+        await self._state.http.pin_message(self.channel.id, self.id)
         self.pinned = True
 
-    @asyncio.coroutine
-    def unpin(self):
+    async def unpin(self):
         """|coro|
 
-        Unpins the message. You must have :attr:`~Permissions.manage_messages`
-        permissions to do this in a non-private channel context.
+        Unpins the message.
+
+        You must have the :attr:`~Permissions.manage_messages` permission to do
+        this in a non-private channel context.
 
         Raises
         -------
@@ -640,19 +644,19 @@ class Message:
             Unpinning the message failed.
         """
 
-        yield from self._state.http.unpin_message(self.channel.id, self.id)
+        await self._state.http.unpin_message(self.channel.id, self.id)
         self.pinned = False
 
-    @asyncio.coroutine
-    def add_reaction(self, emoji):
+    async def add_reaction(self, emoji):
         """|coro|
 
         Add a reaction to the message.
 
         The emoji may be a unicode emoji or a custom guild :class:`Emoji`.
 
-        You must have the :attr:`~Permissions.add_reactions` and
-        :attr:`~Permissions.read_message_history` permissions to use this.
+        You must have the :attr:`~Permissions.read_message_history` permission
+        to use this. If nobody else has reacted to the message using this
+        emoji, the :attr:`~Permissions.add_reactions` permission is required.
 
         Parameters
         ------------
@@ -671,22 +675,10 @@ class Message:
             The emoji parameter is invalid.
         """
 
-        if isinstance(emoji, Reaction):
-            emoji = emoji.emoji
+        emoji = self._emoji_reaction(emoji)
+        await self._state.http.add_reaction(self.id, self.channel.id, emoji)
 
-        if isinstance(emoji, Emoji):
-            emoji = '%s:%s' % (emoji.name, emoji.id)
-        elif isinstance(emoji, PartialEmoji):
-            emoji = emoji._as_reaction()
-        elif isinstance(emoji, str):
-            pass # this is okay
-        else:
-            raise InvalidArgument('emoji argument must be str, Emoji, or Reaction not {.__class__.__name__}.'.format(emoji))
-
-        yield from self._state.http.add_reaction(self.id, self.channel.id, emoji)
-
-    @asyncio.coroutine
-    def remove_reaction(self, emoji, member):
+    async def remove_reaction(self, emoji, member):
         """|coro|
 
         Remove a reaction by the member from the message.
@@ -718,31 +710,33 @@ class Message:
             The emoji parameter is invalid.
         """
 
+        emoji = self._emoji_reaction(emoji)
+
+        if member.id == self._state.self_id:
+            await self._state.http.remove_own_reaction(self.id, self.channel.id, emoji)
+        else:
+            await self._state.http.remove_reaction(self.id, self.channel.id, emoji, member.id)
+
+    @staticmethod
+    def _emoji_reaction(emoji):
         if isinstance(emoji, Reaction):
             emoji = emoji.emoji
 
         if isinstance(emoji, Emoji):
-            emoji = '%s:%s' % (emoji.name, emoji.id)
-        elif isinstance(emoji, PartialEmoji):
-            emoji = emoji._as_reaction()
-        elif isinstance(emoji, str):
-            pass # this is okay
-        else:
-            raise InvalidArgument('emoji argument must be str, Emoji, or Reaction not {.__class__.__name__}.'.format(emoji))
+            return '%s:%s' % (emoji.name, emoji.id)
+        if isinstance(emoji, PartialEmoji):
+            return emoji._as_reaction()
+        if isinstance(emoji, str):
+            return emoji # this is okay
 
-        if member.id == self._state.self_id:
-            yield from self._state.http.remove_own_reaction(self.id, self.channel.id, emoji)
-        else:
-            yield from self._state.http.remove_reaction(self.id, self.channel.id, emoji, member.id)
+        raise InvalidArgument('emoji argument must be str, Emoji, or Reaction not {.__class__.__name__}.'.format(emoji))
 
-    @asyncio.coroutine
-    def clear_reactions(self):
+    async def clear_reactions(self):
         """|coro|
 
         Removes all the reactions from the message.
 
-        You need :attr:`~Permissions.manage_messages` permission
-        to use this.
+        You need the :attr:`~Permissions.manage_messages` permission to use this.
 
         Raises
         --------
@@ -751,7 +745,7 @@ class Message:
         Forbidden
             You do not have the proper permissions to remove all the reactions.
         """
-        yield from self._state.http.clear_reactions(self.id, self.channel.id)
+        await self._state.http.clear_reactions(self.id, self.channel.id)
 
     def ack(self):
         """|coro|
