@@ -1,7 +1,7 @@
 site_name: Quote
 repo_url: https://github.com/Deivedux/Quote
 pages:
-- Home: ../index.md
+- Home: index.md
 - Hosting Guides:
     - Windows Guide: Guides/Windows Guide.md
     - Linux Guide: Guides/Linux Guide.md
