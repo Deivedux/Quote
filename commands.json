@@ -33,5 +33,15 @@
 		"title": ["pinchannel", "pinc"],
 		"description": "Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with :pushpin: to pin a message.",
 		"examples": ["pinchannel #channel", "pinchannel"]
+	},
+	"leave": {
+		"title": ["leave"],
+		"description": "**Owner Only:** Leave the server specified by ID",
+		"examples": ["leave 419984865262305291"]
+	},
+	"shutdown": {
+		"title": ["shutdown"],
+		"description": "**Owner Only:** Shuts down the bot.",
+		"examples": ["shutdown"]
 	}
 }
