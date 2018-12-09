@@ -14,19 +14,22 @@ choice=4
 while [ "$choice" = "4" ]; do
 read choice
 if [ "$choice" = "1" ] ; then
-	run_bot()
+	curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh && sh reqs.sh
+	run_bot
 else
 	if [ "$choice" = "2" ] ; then
+		curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh && sh reqs.sh
 		echo "Starting the bot with auto-restart. Please wait..."
 		sh autorestart_linux.sh
 		exit 1
 		else
 		if [ "$choice" = "3" ] ; then
+			curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh && sh reqs.sh
 			echo "Updating to latest version.."
 			if [ -d "/home/Quote-Latest" ] ; then
 				if [ -d "/home/Quote-Old" ] ; then
 					rm /home/Quote-Old/* -f
-					mv -v /home/Quote-Latest/configs
+					mv -v /home/Quote-Latest/configs -t /home/Quote-Old -f
 					rm -rf /home/Quote-Latest -f
 					git clone -b dev https://github.com/Deivedux/Quote.git /home/Quote-Latest
 					rm -rf /home/Quote-Latest/configs -f
@@ -50,6 +53,7 @@ else
 			fi
 			else
 			if [ "$choice" = "4" ] ; then
+				curl https://raw.githubusercontent.com/aki-jp/QuoteRequirements/master/reqs.sh && sh reqs.sh
 				echo "Updating to stable version.."
 					if [ -d "/home/Quote" ] ; then
 						if [ -d "/home/Quote-Old" ] ; then
