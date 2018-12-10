@@ -75,12 +75,15 @@ class Main:
 				await channel.send(embed = quote_embed(ctx, message, user))
 
 	@commands.command(aliases = ['q'])
-	async def quote(self, ctx, msg_id: int, *, reply = None):
+	async def quote(self, ctx, msg_id: int = None, *, reply = None):
 		if ctx.guild.id in del_commands:
 			try:
 				await ctx.message.delete()
 			except discord.Forbidden:
 				pass
+
+		if not msg_id:
+			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
 
 		message = None
 		async with ctx.channel.typing():
@@ -101,12 +104,15 @@ class Main:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
 
 	@commands.command(aliases = ['quotechan', 'qchan', 'qc'])
-	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int, *, reply = None):
+	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int = None, *, reply = None):
 		if ctx.guild.id in del_commands:
 			try:
 				await ctx.message.delete()
 			except discord.Forbidden:
 				pass
+
+		if not msg_id:
+			return await ctx.send(content = error_string + ' **Please specify a message ID to quote, and if you did, make sure that the first argument is a channel to quote the message from.**')
 
 		message = None
 		async with ctx.channel.typing():
