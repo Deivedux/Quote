@@ -30,7 +30,7 @@ success_string = response_json['response_string']['success']
 error_string = response_json['response_string']['error']
 del response_json
 
-def quote_embed(context, message, user):
+def quote_embed(context_channel, message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
 		embed = discord.Embed(description = message.content, timestamp = message.created_at)
 	else:
@@ -41,7 +41,7 @@ def quote_embed(context, message, user):
 			embed.set_image(url = message.attachments[0].url)
 		else:
 			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
-	if message.channel != context.channel:
+	if message.channel != context_channel:
 		embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + message.channel.name)
 	else:
 		embed.set_footer(text = 'Requester: ' + str(user))
@@ -72,7 +72,7 @@ class Main:
 					break
 
 			if message:
-				await channel.send(embed = quote_embed(ctx, message, user))
+				await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
@@ -98,7 +98,7 @@ class Main:
 		if not message:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
-			await ctx.send(embed = quote_embed(ctx, message, ctx.author))
+			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
@@ -127,7 +127,7 @@ class Main:
 		if not message:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
-			await ctx.send(embed = quote_embed(ctx, message, ctx.author))
+			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
