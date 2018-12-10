@@ -31,20 +31,20 @@ class BotLog:
 				elif i[1] > 500:
 					outages[i[0]] = 0
 					high_latency.append(':warning: **Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms**')
-				elif i[1] in outages.keys():
+				elif i[0] in outages.keys():
 					outages[i[0]] = outages[i[0]] + 1
 					if outages[i[0]] == 3:
 						del outages[i[0]]
-						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3 (successfully recovered)')
+						high_latency.append('**Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms |** Check: ' + str(outages[i[0]]) + '/3 (successfully recovered)')
 					else:
-						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3')
+						high_latency.append('**Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms |** Check: ' + str(outages[i[0]]) + '/3')
 
 			if len(high_latency) > 0:
 				async with aiohttp.ClientSession() as session:
 					webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
 					await webhook.send(content = '\n'.join(high_latency))
 
-			await asyncio.sleep(60)
+			await asyncio.sleep(90)
 
 	async def on_guild_join(self, guild):
 		bots = [member for member in guild.members if member.bot]
