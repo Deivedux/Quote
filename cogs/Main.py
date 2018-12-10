@@ -30,7 +30,7 @@ success_string = response_json['response_string']['success']
 error_string = response_json['response_string']['error']
 del response_json
 
-def quote_embed(message, user):
+def quote_embed(context, message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
 		embed = discord.Embed(description = message.content, timestamp = message.created_at)
 	else:
@@ -41,7 +41,10 @@ def quote_embed(message, user):
 			embed.set_image(url = message.attachments[0].url)
 		else:
 			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
-	embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + message.channel.name)
+	if message.channel != context.channel:
+		embed.set_footer(text = 'Requester: ' + str(user) + ' | in channel: #' + message.channel.name)
+	else:
+		embed.set_footer(text = 'Requester: ' + str(user))
 	return embed
 
 class Main:
@@ -69,7 +72,7 @@ class Main:
 					break
 
 			if message:
-				await channel.send(embed = quote_embed(message, user))
+				await channel.send(embed = quote_embed(ctx, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int, *, reply = None):
@@ -81,27 +84,18 @@ class Main:
 
 		message = None
 		async with ctx.channel.typing():
-			async for msg in ctx.channel.history(limit = 1000, before = ctx.message):
+			async for msg in ctx.channel.history(limit = 10000, before = ctx.message):
 				perms = ctx.guild.me.permissions_in(ctx.channel)
 				if not perms.read_messages or not perms.read_message_history:
 					break
 				if msg.id == msg_id:
 					message = msg
 					break
-			if not message:
-				for channel in ctx.guild.text_channels:
-					perms = ctx.guild.me.permissions_in(channel)
-					if not perms.read_messages or not perms.read_message_history or channel == ctx.channel:
-						continue
-					async for msg in channel.history(limit = 1000):
-						if msg.id == msg_id:
-							message = msg
-							break
 
 		if not message:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
-			await ctx.send(embed = quote_embed(message, ctx.author))
+			await ctx.send(embed = quote_embed(ctx, message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
@@ -127,7 +121,7 @@ class Main:
 		if not message:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 		else:
-			await ctx.send(embed = quote_embed(message, ctx.author))
+			await ctx.send(embed = quote_embed(ctx, message, ctx.author))
 
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
