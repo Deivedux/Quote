@@ -35,9 +35,9 @@ class BotLog:
 					outages[i[0]] = outages[i[0]] + 1
 					if outages[i[0]] == 3:
 						del outages[i[0]]
-						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3 (successfully recovered)')
+						high_latency.append('**Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms** | Check: ' + str(outages[i[0]]) + '/3 (successfully recovered)')
 					else:
-						high_latency.append('**Shard #' + str(i[0]) + ' |** Check: ' + str(outages[i[0]]) + '/3')
+						high_latency.append('**Shard #' + str(i[0]) + ' | ' + str(i[1]) + 'ms** | Check: ' + str(outages[i[0]]) + '/3')
 
 			if len(high_latency) > 0:
 				async with aiohttp.ClientSession() as session:
