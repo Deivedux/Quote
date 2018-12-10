@@ -1,5 +1,6 @@
 [![Support Server](https://discordapp.com/api/guilds/418455732741079040/widget.png?style=shield)](https://discord.gg/sbySHxA)
 [![Quote Bot](https://discordbots.org/api/widget/status/447176783704489985.svg)](https://discordbots.org/bot/447176783704489985)
+[![Code Quality](https://api.codacy.com/project/badge/Grade/81a0a0e33ddd4a32882fe57ebb5d60a1)](https://app.codacy.com/app/aki-jp/Quote?utm_source=github.com&utm_medium=referral&utm_content=Deivedux/Quote&utm_campaign=Badge_Grade_Dashboard)
 
 # Stop self-botting, quote messages the legal way
 
