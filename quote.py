@@ -9,6 +9,7 @@ conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
+c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
 
 from cogs.Main import prefixes
 
@@ -62,10 +63,14 @@ async def on_ready():
 		await bot.change_presence(status = discord.Status.online, activity = discord.Activity(name = 'messages in ' + str(len(bot.guilds)) + ' servers', type = 3))
 		await asyncio.sleep(120)
 
+from cogs.OwnerOnly import blacklist_ids
+
 @bot.event
 async def on_message(message):
-	if message.author.bot:
+	if message.author.bot or message.author.id in blacklist_ids:
 		return
+	elif message.guild.id in blacklist_ids:
+		return await message.guild.leave()
 
 	await bot.process_commands(message)
 
