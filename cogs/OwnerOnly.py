@@ -39,6 +39,9 @@ class Owneronly:
 			else:
 				blacklist_ids.append(object_id)
 				await ctx.send(content = success_string + ' **Successfully blacklisted:** `' + str(object_id) + '`')
+				guild = self.bot.get_guild(object_id)
+				if guild:
+					await guild.leave()
 
 	@commands.command()
 	async def blacklistcheck(self, ctx, object_id: int):
