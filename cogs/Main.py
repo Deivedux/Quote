@@ -4,6 +4,7 @@ import asyncio
 import sqlite3
 import json
 from discord.ext import commands
+from cogs.OwnerOnly import blacklist_ids
 
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
@@ -60,7 +61,7 @@ class Main:
 		conn.commit()
 
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '💬' and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
+		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and payload.guild_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
 			guild = self.bot.get_guild(payload.guild_id)
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)

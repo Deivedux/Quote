@@ -34,6 +34,21 @@
 		"description": "Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with :pushpin: to pin a message.",
 		"examples": ["pinchannel #channel", "pinchannel"]
 	},
+	"blacklistadd": {
+		"title": ["blacklistadd"],
+		"description": "Blacklist a user/server with a specified ID with an optional reason.",
+		"examples": ["blacklistadd 447176783704489985 Abusing bot"]
+	},
+	"blacklistcheck": {
+		"title": ["blacklistcheck"],
+		"description": "Check if the specified ID is blacklisted.",
+		"examples": ["blacklistcheck 447176783704489985"]
+	},
+	"blacklistremove": {
+		"title": ["blacklistremove"],
+		"description": "Remove a specified ID from a blacklist.",
+		"examples": ["blacklistremove 447176783704489985"]
+	},
 	"leave": {
 		"title": ["leave"],
 		"description": "**Owner Only:** Leave the server specified by ID",
