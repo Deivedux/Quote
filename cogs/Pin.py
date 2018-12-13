@@ -11,7 +11,7 @@ server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
 pin_channels = {}
 for i in server_config_raw:
 	if i[4] != None:
-		pin_channels[int(i[0])] = int(i[3])
+		pin_channels[int(i[0])] = int(i[4])
 del server_config_raw
 
 with open('configs/config.json') as json_data:
