@@ -68,7 +68,7 @@ from cogs.OwnerOnly import blacklist_ids
 @bot.event
 async def on_guild_join(guild):
 	if message.guild.id in blacklist_ids:
-		return await message.guild.leave()
+		await message.guild.leave()
 
 @bot.event
 async def on_message(message):
