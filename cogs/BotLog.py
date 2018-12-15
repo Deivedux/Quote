@@ -50,13 +50,13 @@ class BotLog:
 		bots = [member for member in guild.members if member.bot]
 		async with aiohttp.ClientSession() as session:
 			webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
-			await webhook.send(content = ':inbox_tray: **Guild Added** `' + guild.name + '` (`' + str(guild.id) + '`)\n  Total: **' + str(guild.member_count) + '** | Users: **' + str(guild.member_count - len(bots)) + '** | Bots: **' + str(len(bots)) + '**')
+			await webhook.send(content = ':inbox_tray: **Guild Added** `' + guild.name.strip('`') + '` (`' + str(guild.id) + '`)\n  Total: **' + str(guild.member_count) + '** | Users: **' + str(guild.member_count - len(bots)) + '** | Bots: **' + str(len(bots)) + '**')
 
 	async def on_guild_remove(self, guild):
 		bots = [member for member in guild.members if member.bot]
 		async with aiohttp.ClientSession() as session:
 			webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
-			await webhook.send(content = ':outbox_tray: **Guild Removed** `' + guild.name + '` (`' + str(guild.id) + '`)\n  Total: **' + str(guild.member_count) + '** | Users: **' + str(guild.member_count - len(bots)) + '** | Bots: **' + str(len(bots)) + '**')
+			await webhook.send(content = ':outbox_tray: **Guild Removed** `' + guild.name.strip('`') + '` (`' + str(guild.id) + '`)\n  Total: **' + str(guild.member_count) + '** | Users: **' + str(guild.member_count - len(bots)) + '** | Bots: **' + str(len(bots)) + '**')
 
 
 def setup(bot):
