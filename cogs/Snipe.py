@@ -48,7 +48,7 @@ class Snipe:
 
 	@commands.command()
 	async def snipe(self, ctx, channel: discord.TextChannel = None):
-		if not ctx.author.guild_permission.manage_messages:
+		if not ctx.author.guild_permissions.manage_messages:
 			return
 
 		if not channel:
