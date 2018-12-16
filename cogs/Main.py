@@ -35,7 +35,7 @@ def quote_embed(context_channel, message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
 		embed = discord.Embed(description = message.content, timestamp = message.created_at)
 	else:
-		embed = discord.Embed(description = message.content, color = message.author.color,  timestamp = message.created_at)
+		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
 	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
 	if message.attachments:
 		if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
