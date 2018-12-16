@@ -48,16 +48,16 @@ class Snipe:
 
 	@commands.command()
 	async def snipe(self, ctx, channel: discord.TextChannel = None):
-		if not ctx.author.guild_permissions.manage_messages:
-			return
-
 		if not channel:
 			channel = ctx.channel
+
+		if not ctx.author.guild_permissions.manage_messages or not ctx.author.permissions_in(channel).read_messages:
+			return
 
 		try:
 			sniped_message = snipes[ctx.guild.id][channel.id]
 		except KeyError:
-			return await ctx.send(content = error_string + ' **No deleted messages available yet.**')
+			return await ctx.send(content = error_string + ' **No available messages.**')
 
 		await ctx.send(embed = snipe_embed(ctx.channel, sniped_message, ctx.author))
 
