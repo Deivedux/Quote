@@ -8,7 +8,6 @@ conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 blacklist_raw = c.execute("SELECT Id FROM Blacklist").fetchall()
-global blacklist_ids
 blacklist_ids = [int(i[0]) for i in blacklist_raw]
 del blacklist_raw
 

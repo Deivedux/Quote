@@ -10,7 +10,6 @@ conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
-global prefixes
 prefixes = {}
 del_commands = []
 on_reaction = []
