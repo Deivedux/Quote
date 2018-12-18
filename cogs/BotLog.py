@@ -6,9 +6,8 @@ from discord.ext import commands
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-webhook_url = response_json['botlog_webhook_url']
-del response_json
+	webhook_url = response_json['botlog_webhook_url']
+	del response_json
 
 outages = {}
 

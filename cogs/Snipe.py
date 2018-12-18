@@ -4,10 +4,9 @@ from discord.ext import commands
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 snipes = {}
 
