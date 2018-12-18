@@ -40,7 +40,7 @@ class Snipe:
 			pass
 
 	async def on_message_delete(self, message):
-		if message.guild and message.guild.me.permissions_in(message.channel).send_messages and not message.author.bot:
+		if message.guild and not message.author.bot:
 			try:
 				snipes[message.guild.id][message.channel.id] = message
 			except KeyError:
