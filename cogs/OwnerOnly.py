@@ -13,11 +13,10 @@ del blacklist_raw
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-owners = response_json['owner_ids']
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	owners = response_json['owner_ids']
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 class Owneronly:
 	def __init__(self, bot):
