@@ -64,8 +64,8 @@ class Snipe:
 			sniped_message = snipes[ctx.guild.id][channel.id]
 		except KeyError:
 			return await ctx.send(content = error_string + ' **No available messages.**')
-
-		await ctx.send(embed = snipe_embed(ctx.channel, sniped_message, ctx.author))
+		else:
+			await ctx.send(embed = snipe_embed(ctx.channel, sniped_message, ctx.author))
 
 
 def setup(bot):
