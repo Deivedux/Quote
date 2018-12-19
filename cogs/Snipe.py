@@ -1,6 +1,7 @@
 import discord
 import json
 from discord.ext import commands
+from cogs.Main import del_commands
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -52,6 +53,12 @@ class Snipe:
 
 		if not ctx.author.guild_permissions.manage_messages or not ctx.author.permissions_in(channel).read_messages:
 			return
+
+		if ctx.guild.id in del_commands:
+			try:
+				await ctx.message.delete()
+			except discord.Forbidden:
+				pass
 
 		try:
 			sniped_message = snipes[ctx.guild.id][channel.id]
