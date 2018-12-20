@@ -46,7 +46,7 @@ class PersonalQuotes:
 
 		await ctx.send(content = success_string + ' **Quote added.**')
 
-	@commands.command(aliases = ['premove'])
+	@commands.command(aliases = ['premove', 'prem'])
 	async def personalremove(self, ctx, *, trigger):
 		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id)).fetchall()
 		if trigger in [i[1] for i in user_quotes]:
