@@ -14,6 +14,26 @@
 		"description": "Quote a message using a message ID from a specific channel.",
 		"examples": ["qc #channel 492444904681897986 My reply!"]
 	},
+	"personaladd": {
+		"title": ["personaladd", "padd"],
+		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.",
+		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
+	},
+	"personalremove": {
+		"title": ["personalremove", "premove"],
+		"description": "Remove your personal quote with a specified trigger.",
+		"examples": ["premove my trigger"]
+	},
+	"personal": {
+		"title": ["personal", "p"],
+		"description": "Execute your personal quote with a chosen trigger.",
+		"examples": ["p my trigger"]
+	},
+	"personallist": {
+		"title": ["personallist", "plist"],
+		"description": "List your personal quotes.",
+		"examples": ["plist"]
+	},
 	"prefix": {
 		"title": ["prefix"],
 		"description": "See currently set prefix, or change to a different prefix for this server.",
