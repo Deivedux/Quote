@@ -20,7 +20,7 @@
 		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
 	},
 	"personalremove": {
-		"title": ["personalremove", "premove"],
+		"title": ["personalremove", "prem", "premove"],
 		"description": "Remove your personal quote with a specified trigger.",
 		"examples": ["premove my trigger"]
 	},
