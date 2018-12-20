@@ -10,6 +10,7 @@ c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT)")
 
 from cogs.Main import prefixes
 
@@ -28,11 +29,11 @@ async def get_prefix(bot, message):
 	else:
 		return commands.when_mentioned_or(default_prefix)(bot, message)
 
-bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, status = discord.Status.idle, activity = discord.Game('starting up...'), fetch_offline_members = False, max_messages = 500)
+bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = True, status = discord.Status.idle, activity = discord.Game('starting up...'), fetch_offline_members = False, max_messages = 1000)
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
-startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe']
+startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe', 'cogs.PersonalQuotes']
 for cog in startup_extensions:
 	try:
 		bot.load_extension(cog)
@@ -74,7 +75,7 @@ async def on_guild_join(guild):
 async def on_message(message):
 	if message.author.bot or message.author.id in blacklist_ids:
 		return
-	elif message.guild.id in blacklist_ids:
+	elif message.guild and message.guild.id in blacklist_ids:
 		return await message.guild.leave()
 
 	await bot.process_commands(message)

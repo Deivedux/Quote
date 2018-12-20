@@ -1,13 +1,13 @@
 import discord
 import json
 from discord.ext import commands
+from cogs.Main import del_commands
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 snipes = {}
 
@@ -18,9 +18,9 @@ def snipe_embed(context_channel, message, user):
 		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
 	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url)
 	if message.channel != context_channel:
-		embed.set_footer(text = 'Snipped by ' + str(user) + ' | in channel: #' + message.channel.name)
+		embed.set_footer(text = 'Sniped by ' + str(user) + ' | in channel: #' + message.channel.name)
 	else:
-		embed.set_footer(text = 'Snipped by ' + str(user))
+		embed.set_footer(text = 'Sniped by ' + str(user))
 	return embed
 
 class Snipe:
@@ -40,7 +40,7 @@ class Snipe:
 			pass
 
 	async def on_message_delete(self, message):
-		if message.guild.me.permissions_in(message.channel).send_messages:
+		if message.guild and not message.author.bot:
 			try:
 				snipes[message.guild.id][message.channel.id] = message
 			except KeyError:
@@ -54,12 +54,18 @@ class Snipe:
 		if not ctx.author.guild_permissions.manage_messages or not ctx.author.permissions_in(channel).read_messages:
 			return
 
+		if ctx.guild.id in del_commands:
+			try:
+				await ctx.message.delete()
+			except discord.Forbidden:
+				pass
+
 		try:
 			sniped_message = snipes[ctx.guild.id][channel.id]
 		except KeyError:
 			return await ctx.send(content = error_string + ' **No available messages.**')
-
-		await ctx.send(embed = snipe_embed(ctx.channel, sniped_message, ctx.author))
+		else:
+			await ctx.send(embed = snipe_embed(ctx.channel, sniped_message, ctx.author))
 
 
 def setup(bot):

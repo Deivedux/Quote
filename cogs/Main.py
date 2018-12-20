@@ -10,7 +10,6 @@ conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
-global prefixes
 prefixes = {}
 del_commands = []
 on_reaction = []
@@ -25,11 +24,10 @@ del server_config_raw
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-default_prefix = response_json['default_prefix']
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	default_prefix = response_json['default_prefix']
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 def quote_embed(context_channel, message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
@@ -61,7 +59,7 @@ class Main:
 		conn.commit()
 
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and payload.guild_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
+		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
 			guild = self.bot.get_guild(payload.guild_id)
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)

@@ -16,17 +16,16 @@ del server_config_raw
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 class Pin:
 	def __init__(self, bot):
 		self.bot = bot
 
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '📌' and payload.user_id not in blacklist_ids and payload.guild_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot:
+		if str(payload.emoji) == '📌' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot:
 			guild = self.bot.get_guild(payload.guild_id)
 			try:
 				channel = guild.get_channel(pin_channels[payload.guild_id])

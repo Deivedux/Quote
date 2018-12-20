@@ -8,17 +8,15 @@ conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
 blacklist_raw = c.execute("SELECT Id FROM Blacklist").fetchall()
-global blacklist_ids
 blacklist_ids = [int(i[0]) for i in blacklist_raw]
 del blacklist_raw
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
-
-owners = response_json['owner_ids']
-success_string = response_json['response_string']['success']
-error_string = response_json['response_string']['error']
-del response_json
+	owners = response_json['owner_ids']
+	success_string = response_json['response_string']['success']
+	error_string = response_json['response_string']['error']
+	del response_json
 
 class Owneronly:
 	def __init__(self, bot):
