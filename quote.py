@@ -74,7 +74,7 @@ async def on_guild_join(guild):
 async def on_message(message):
 	if message.author.bot or message.author.id in blacklist_ids:
 		return
-	elif message.guild.id in blacklist_ids:
+	elif message.guild and message.guild.id in blacklist_ids:
 		return await message.guild.leave()
 
 	await bot.process_commands(message)
