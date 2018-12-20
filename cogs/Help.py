@@ -2,6 +2,7 @@ import discord
 import json
 from discord.ext import commands
 from cogs.Main import prefixes
+from collections import OrderedDict
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -21,7 +22,7 @@ class Help:
 			guild_prefix = default_prefix
 
 		with open('commands.json') as json_data:
-			commands_json = json.load(json_data)
+			commands_json = json.load(json_data, object_pairs_hook = OrderedDict)
 
 		if not command:
 
