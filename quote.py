@@ -10,7 +10,7 @@ c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT)")
 
 from cogs.Main import prefixes
 
@@ -69,7 +69,7 @@ from cogs.OwnerOnly import blacklist_ids
 @bot.event
 async def on_guild_join(guild):
 	if message.guild.id in blacklist_ids:
-		await message.guild.leave()
+		await guild.leave()
 
 @bot.event
 async def on_message(message):
