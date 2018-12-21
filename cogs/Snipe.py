@@ -18,9 +18,9 @@ def snipe_embed(context_channel, message, user):
 		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
 	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url)
 	if message.channel != context_channel:
-		embed.set_footer(text = 'Sniped by ' + str(user) + ' | in channel: #' + message.channel.name)
+		embed.set_footer(text = 'Sniped by ' + str(user) + ' | in channel: #' + message.channel.name, icon_url = user.avatar_url)
 	else:
-		embed.set_footer(text = 'Sniped by ' + str(user))
+		embed.set_footer(text = 'Sniped by ' + str(user), icon_url = user.avatar_url)
 	return embed
 
 class Snipe:
