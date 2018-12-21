@@ -21,7 +21,7 @@ def personal_embed(db_response, author):
 	embed.set_author(name = str(author), icon_url = author.avatar_url)
 	if db_response[3] != None:
 		attachments = db_response[3].split(' | ')
-		if len(attachments) == 1 and attachments[0].lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
+		if len(attachments) == 1 and attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 			embed.set_image(url = attachments[0])
 		else:
 			embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
