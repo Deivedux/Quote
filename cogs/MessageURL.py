@@ -21,7 +21,7 @@ class MessageURL:
 
 	async def on_message(self, message):
 		perms = message.guild.me.permissions_in(message.channel)
-		if not perms.send_messages or not perms.embed_links:
+		if not perms.send_messages or not perms.embed_links or message.author.bot:
 			return
 
 		for i in message.content.split():
