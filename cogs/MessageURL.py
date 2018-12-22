@@ -12,7 +12,7 @@ def quote_embed(message, user):
 			embed.set_image(url = message.attachments[0].url)
 		else:
 			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
-	embed.set_footer(text = 'Linked by: ' + str(user), icon_url = user.avatar_url)
+	embed.set_footer(text = 'Linked by: ' + str(user))
 	return embed
 
 class MessageURL:

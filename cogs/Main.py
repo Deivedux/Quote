@@ -41,9 +41,9 @@ def quote_embed(context_channel, message, user):
 		else:
 			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
 	if message.channel != context_channel:
-		embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name, icon_url = user.avatar_url)
+		embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name)
 	else:
-		embed.set_footer(text = 'Quoted by: ' + str(user), icon_url = user.avatar_url)
+		embed.set_footer(text = 'Quoted by: ' + str(user))
 	return embed
 
 class Main:
