@@ -20,6 +20,10 @@ class MessageURL:
 		self.bot = bot
 
 	async def on_message(self, message):
+		perms = message.guild.me.permissions_in(message.channel)
+		if not perms.send_messages or not perms.embed_links:
+			return
+
 		for i in message.content.split():
 			word = i.lower().strip('<>')
 			if word.startswith('https://canary.discordapp.com/channels/'):
