@@ -17,10 +17,12 @@ def snipe_embed(context_channel, message, user):
 	else:
 		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
 	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url)
+	if message.attachments:
+		embed.add_field(name = 'Attachment(s)', value = '\n'.join([attachment.filename for attachment in message.attachments]) + '\n\n__Attachment URLs are invalidated once the message is deleted.__')
 	if message.channel != context_channel:
-		embed.set_footer(text = 'Sniped by ' + str(user) + ' | in channel: #' + message.channel.name)
+		embed.set_footer(text = 'Sniped by: ' + str(user) + ' | in channel: #' + message.channel.name)
 	else:
-		embed.set_footer(text = 'Sniped by ' + str(user))
+		embed.set_footer(text = 'Sniped by: ' + str(user))
 	return embed
 
 class Snipe:
