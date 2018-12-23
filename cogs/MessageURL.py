@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from cogs.OwnerOnly import blacklist_ids
 
 def quote_embed(message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
@@ -21,7 +22,7 @@ class MessageURL:
 
 	async def on_message(self, message):
 		perms = message.guild.me.permissions_in(message.channel)
-		if not perms.send_messages or not perms.embed_links or message.author.bot:
+		if not perms.send_messages or not perms.embed_links or message.author.bot or message.author.id in blacklist_ids:
 			return
 
 		for i in message.content.split():
