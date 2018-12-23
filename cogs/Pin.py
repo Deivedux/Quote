@@ -40,32 +40,28 @@ class Pin:
 
 			user = guild.get_member(payload.user_id)
 			pin_channel = self.bot.get_channel(payload.channel_id)
-			if not user.permissions_in(pin_channel).manage_messages:
+			if not user.permissions_in(pin_channel).manage_messages or channel == pin_channel:
 				return
 
-			message = None
-			async for msg in self.bot.get_channel(payload.channel_id).history(limit = 10000):
-				if msg.channel.id == pin_channels[payload.guild_id]:
-					break
-				if msg.id == payload.message_id and (msg.content or msg.attachments):
-					message = msg
-					break
-
-			if message:
-				async for msg in channel.history(limit = 50):
+			try:
+				message = await pin_channel.get_message(payload.message_id)
+			except discord.Forbidden:
+				return
+			else:
+				async for msg in channel.history(limit = 100):
 					if str(payload.message_id) in msg.content:
 						return
 
 				embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
 				embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(payload.guild_id) + '/' + str(payload.channel_id) + '/' + str(payload.message_id))
 				if message.attachments:
-					if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
+					if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 						embed.set_image(url = message.attachments[0].url)
 					else:
-						attachments = []
+						attachment_count = 0
 						for attachment in message.attachments:
-							attachments.append('[' + str(attachment.filename) + '](' + str(attachment.url) + ')')
-						embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
+							attachment_count+=1
+							embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
 
 				await channel.send(content = '📌 **Message ID:** ' + str(payload.message_id) + ' | ' + pin_channel.mention, embed = embed)
 
@@ -88,7 +84,7 @@ class Pin:
 				conn.commit()
 			pin_channels[ctx.guild.id] = channel.id
 
-			await ctx.send(content = success_string + ' **Pin channel set to ' + channel.mention + '.**')
+			await ctx.send(content = success_string + ' **Pin channel set to** ' + channel.mention)
 
 		else:
 

@@ -33,7 +33,7 @@ bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = Tr
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
-startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe', 'cogs.PersonalQuotes']
+startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe', 'cogs.PersonalQuotes', 'cogs.MessageURL']
 for cog in startup_extensions:
 	try:
 		bot.load_extension(cog)
