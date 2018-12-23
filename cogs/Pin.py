@@ -40,19 +40,15 @@ class Pin:
 
 			user = guild.get_member(payload.user_id)
 			pin_channel = self.bot.get_channel(payload.channel_id)
-			if not user.permissions_in(pin_channel).manage_messages:
+			if not user.permissions_in(pin_channel).manage_messages or channel == pin_channel:
 				return
 
-			message = None
-			async for msg in self.bot.get_channel(payload.channel_id).history(limit = 10000):
-				if msg.channel.id == pin_channels[payload.guild_id]:
-					break
-				if msg.id == payload.message_id and (msg.content or msg.attachments):
-					message = msg
-					break
-
-			if message:
-				async for msg in channel.history(limit = 50):
+			try:
+				message = await pin_channel.get_message(payload.message_id)
+			except discord.Forbidden:
+				return
+			else:
+				async for msg in channel.history(limit = 100):
 					if str(payload.message_id) in msg.content:
 						return
 

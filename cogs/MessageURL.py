@@ -48,13 +48,14 @@ class MessageURL:
 						msg_id = int(list_ids[1])
 					except:
 						continue
-					msg_found = None
-					async for msg in channel.history(limit = 10000):
-						if msg.id == msg_id:
-							msg_found = msg
-							break
-
-					if msg_found:
+					
+					try:
+						msg_found = await channel.get_message(msg_id)
+					except discord.NotFound:
+						continue
+					except discord.Forbidden:
+						continue
+					else:
 						await message.channel.send(embed = quote_embed(msg_found, message.author))
 
 

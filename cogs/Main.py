@@ -64,70 +64,50 @@ class Main:
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)
 
-			message = None
-			async for msg in channel.history(limit = 10000):
-				if msg.id == payload.message_id:
-					message = msg
-					break
-
-			if message:
+			try:
+				message = await channel.get_message(payload.message_id)
+			except discord.NotFound:
+				return
+			except discord.Forbidden:
+				return
+			else:
 				await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
-		if ctx.guild.id in del_commands:
-			try:
-				await ctx.message.delete()
-			except discord.Forbidden:
-				pass
-
 		if not msg_id:
 			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
 
-		message = None
-		async with ctx.channel.typing():
-			async for msg in ctx.channel.history(limit = 10000, before = ctx.message):
-				perms = ctx.guild.me.permissions_in(ctx.channel)
-				if not perms.read_messages or not perms.read_message_history:
-					break
-				if msg.id == msg_id:
-					message = msg
-					break
+		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+			await ctx.message.delete()
 
-		if not message:
+		try:
+			message = await ctx.channel.get_message(msg_id)
+		except discord.NotFound:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
+		except discord.Forbidden:
+			await ctx.send(content = error_string + ' **I do not have enough permissions to get the message.**')
 		else:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
 
 	@commands.command(aliases = ['quotechan', 'qchan', 'qc'])
 	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int = None, *, reply = None):
-		if ctx.guild.id in del_commands:
-			try:
-				await ctx.message.delete()
-			except discord.Forbidden:
-				pass
-
 		if not msg_id:
 			return await ctx.send(content = error_string + ' **Please specify a message ID to quote, and if you did, make sure that the first argument is a channel to quote the message from.**')
 
-		message = None
-		async with ctx.channel.typing():
-			async for msg in channel.history(limit = 10000, before = ctx.message):
-				perms = ctx.guild.me.permissions_in(channel)
-				if not perms.read_messages or not perms.read_message_history:
-					break
-				if msg.id == msg_id:
-					message = msg
-					break
+		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+			await ctx.message.delete()
 
-		if not message:
+		try:
+			message = await channel.get_message(msg_id)
+		except discord.NotFound:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
+		except discord.Forbidden:
+			await ctx.send(content = error_string + ' **I do not have enough permissions to get the message.**')
 		else:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
 
