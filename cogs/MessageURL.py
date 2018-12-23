@@ -12,7 +12,10 @@ def quote_embed(message, user):
 		if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 			embed.set_image(url = message.attachments[0].url)
 		else:
-			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
+			attachment_count = 0
+			for attachment in message.attachments:
+				attachment_count+=1
+				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
 	embed.set_footer(text = 'Linked by: ' + str(user))
 	return embed
 
@@ -51,9 +54,7 @@ class MessageURL:
 					
 					try:
 						msg_found = await channel.get_message(msg_id)
-					except discord.NotFound:
-						continue
-					except discord.Forbidden:
+					except:
 						continue
 					else:
 						await message.channel.send(embed = quote_embed(msg_found, message.author))

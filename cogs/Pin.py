@@ -55,13 +55,13 @@ class Pin:
 				embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
 				embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(payload.guild_id) + '/' + str(payload.channel_id) + '/' + str(payload.message_id))
 				if message.attachments:
-					if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp')):
+					if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 						embed.set_image(url = message.attachments[0].url)
 					else:
-						attachments = []
+						attachment_count = 0
 						for attachment in message.attachments:
-							attachments.append('[' + str(attachment.filename) + '](' + str(attachment.url) + ')')
-						embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
+							attachment_count+=1
+							embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
 
 				await channel.send(content = '📌 **Message ID:** ' + str(payload.message_id) + ' | ' + pin_channel.mention, embed = embed)
 

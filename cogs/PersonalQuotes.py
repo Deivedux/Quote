@@ -24,7 +24,10 @@ def personal_embed(db_response, author):
 		if len(attachments) == 1 and attachments[0].lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 			embed.set_image(url = attachments[0])
 		else:
-			embed.add_field(name = 'Attachment(s)', value = '\n'.join(attachments))
+			attachment_count = 0
+			for attachment in message.attachments:
+				attachment_count+=1
+				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
 	embed.set_footer(text = 'Personal Quote')
 	return embed
 

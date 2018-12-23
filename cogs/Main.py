@@ -39,7 +39,10 @@ def quote_embed(context_channel, message, user):
 		if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 			embed.set_image(url = message.attachments[0].url)
 		else:
-			embed.add_field(name = 'Attachment(s)', value = '\n'.join(['[' + str(attachment.filename) + '](' + str(attachment.url) + ')' for attachment in message.attachments]))
+			attachment_count = 0
+			for attachment in message.attachments:
+				attachment_count+=1
+				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
 	if message.channel != context_channel:
 		embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name)
 	else:
