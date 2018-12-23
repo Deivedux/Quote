@@ -88,7 +88,7 @@ class Pin:
 				conn.commit()
 			pin_channels[ctx.guild.id] = channel.id
 
-			await ctx.send(content = success_string + ' **Pin channel set to ' + channel.mention + '.**')
+			await ctx.send(content = success_string + ' **Pin channel set to** ' + channel.mention)
 
 		else:
 
