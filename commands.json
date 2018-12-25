@@ -59,6 +59,11 @@
 		"description": "Snipe the last deleted message from a specified channel. Defaults to the current channel.",
 		"examples": ["snipe", "snipe #general"]
 	},
+	"donators": {
+		"title": ["donators"],
+		"description": "List users that support Quote on Patreon.",
+		"examples": ["donators"]
+	},
 	"blacklistadd": {
 		"title": ["blacklistadd"],
 		"description": "Blacklist a user/server with a specified ID with an optional reason.",

@@ -23,6 +23,32 @@ class Owneronly:
 		self.bot = bot
 
 	@commands.command()
+	async def donator(self, ctx, user_id: int):
+		if ctx.author.id in owners:
+			patrons = [int(i[0]) for i in c.execute("SELECT UserId FROM Donators").fetchall()]
+			if user_id not in patrons:
+				user = self.bot.get_user(user_id)
+				if not user:
+					try:
+						user = await self.bot.get_user_info(user_id)
+					except discord.NotFound:
+						return await ctx.send(content = error_string + ' **That user does not exist.**')
+
+				c.execute("INSERT INTO Donators (UserId, UserTag) VALUES (" + str(user_id) + ", '" + str(user) + "')")
+				conn.commit()
+
+				await ctx.send(content = success_string + ' **Added `' + str(user) + '` to the donators list.**')
+			else:
+				c.execute("DELETE FROM Donators WHERE UserId = " + str(user_id))
+				conn.commit()
+
+				user = self.bot.get_user(user_id)
+				if not user:
+					user = await self.bot.get_user_info(user_id)
+
+				await ctx.send(content = success_string + ' **Removed `' + str(user) + '` from the donators list.**')
+
+	@commands.command()
 	async def blacklistadd(self, ctx, object_id: int, *, reason = None):
 		if ctx.author.id in owners:
 			try:
