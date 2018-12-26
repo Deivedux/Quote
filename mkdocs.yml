@@ -8,5 +8,7 @@ pages:
     - Credentials Guide: Guides/Credentials Guide.md
 - Other Guides:
     - Bug Reporting: Guides/Reporting Bugs.md
+- Explanation of Features:
+    - Commands List: Explanation of Features/Commands List.md
 
 theme: readthedocs
