@@ -19,7 +19,7 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 * You can quote messages from any channel by using the `>quote` command, like this: `>quote 507103646995972096 My Optional Reply`, where the number is the ID of the message you want to quote.
 
 
-  * https://cdn.discordapp.com/attachments/347329036084707330/528281615911223296/unknown.png
+  * ![Copy Link](https://cdn.discordapp.com/attachments/347329036084707330/528281615911223296/unknown.png)
   
 
   * To get message IDs you need to enable Developer Mode in Discord >settings >Appearance >Developer Mode, and right click on a message >Copy ID.
@@ -29,16 +29,18 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
   * ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
   
   
+  
 
 * **You can now quote by directly sending a link to a message**, Quote will automatically embed the linked message.
 
-  * https://cdn.discordapp.com/attachments/347329036084707330/528282464142229504/unknown.png
+  * ![Copy Link](https://cdn.discordapp.com/attachments/347329036084707330/528282464142229504/unknown.png)
 
   * To obtain the link to a message enable Developer Mode as described above and click on the three dots to the right of a message, there will be a Copy Link option.
 
   * ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
   
   
+
 
 * The footer contains useful information on the requester, channel of the original message and timestamp of the original message.
 
