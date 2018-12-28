@@ -97,7 +97,7 @@ class Main:
 						continue
 
 					try:
-						message = await channe.get_message(msg_id)
+						message = await channel.get_message(msg_id)
 					except:
 						continue
 					else:
