@@ -36,7 +36,9 @@ def quote_embed(context_channel, message, user):
 		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
 	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
 	if message.attachments:
-		if len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
+		if message.channel.is_nsfw() and not context_channel.is_nsfw():
+			embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
+		elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
 			embed.set_image(url = message.attachments[0].url)
 		else:
 			attachment_count = 0
@@ -84,16 +86,29 @@ class Main:
 		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
+		message = None
 		try:
 			message = await ctx.channel.get_message(msg_id)
-		except discord.NotFound:
-			await ctx.send(content = error_string + ' **Could not find the specified message.**')
-		except discord.Forbidden:
-			await ctx.send(content = error_string + ' **I do not have enough permissions to get the message.**')
-		else:
+		except:
+			async with ctx.typing():
+				for channel in ctx.guild.text_channels:
+					perms = ctx.guild.me.permissions_in(channel)
+					if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
+						continue
+
+					try:
+						message = await channe.get(msg_id)
+					except:
+						continue
+					else:
+						break
+
+		if message:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
+		else:
+			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
 	@commands.command(aliases = ['quotechan', 'qchan', 'qc'])
 	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int = None, *, reply = None):

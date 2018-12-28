@@ -1,8 +1,12 @@
 import discord
 import json
+import sqlite3
 from discord.ext import commands
 from cogs.Main import prefixes
 from collections import OrderedDict
+
+conn = sqlite3.connect('configs/QuoteBot.db')
+c = conn.cursor()
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -42,6 +46,11 @@ class Help:
 			embed = discord.Embed(title = ' / '.join(['`' + guild_prefix + i + '`' for i in command_help['title']]), description = command_help['description'], color = 0x08FF00)
 			embed.add_field(name = 'Example', value = ' or '.join(['`' + guild_prefix + i + '`' for i in command_help['examples']]))
 			await ctx.send(embed = embed)
+
+	@commands.command()
+	async def donators(self, ctx):
+		patrons = [i[0] for i in c.execute("SELECT UserTag FROM Donators").fetchall()]
+		await ctx.send(embed = discord.Embed(title = 'Quote Donators', description = ', '.join(['`' + i + '`' for i in patrons]), color = 0x08FF00))
 
 
 def setup(bot):
