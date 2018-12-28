@@ -84,6 +84,11 @@
 |Description|Check if the specified ID is blacklisted.|
 |Example|`>blacklistcheck 447176783704489985`|
 
+|Command|`>donator`|
+|---|---|
+|Description|Add/remove a user from `>donators` using their user ID.|
+|Example|`>donator 415570038175825930`|
+
 |Command|`>leave`|
 |---|---|
 |Description|Leaves the server with specified ID.|

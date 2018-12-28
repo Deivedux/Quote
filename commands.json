@@ -63,30 +63,5 @@
 		"title": ["donators"],
 		"description": "List users that support Quote on Patreon.",
 		"examples": ["donators"]
-	},
-	"blacklistadd": {
-		"title": ["blacklistadd"],
-		"description": "Blacklist a user/server with a specified ID with an optional reason.",
-		"examples": ["blacklistadd 447176783704489985 Abusing bot"]
-	},
-	"blacklistcheck": {
-		"title": ["blacklistcheck"],
-		"description": "Check if the specified ID is blacklisted.",
-		"examples": ["blacklistcheck 447176783704489985"]
-	},
-	"blacklistremove": {
-		"title": ["blacklistremove"],
-		"description": "Remove a specified ID from a blacklist.",
-		"examples": ["blacklistremove 447176783704489985"]
-	},
-	"leave": {
-		"title": ["leave"],
-		"description": "**Owner Only:** Leave the server specified by ID",
-		"examples": ["leave 419984865262305291"]
-	},
-	"shutdown": {
-		"title": ["shutdown"],
-		"description": "**Owner Only:** Shuts down the bot.",
-		"examples": ["shutdown"]
 	}
 }
