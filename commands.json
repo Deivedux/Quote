@@ -4,6 +4,11 @@
 		"description": "Show this message, or more details on a specific command.",
 		"examples": ["help"]
 	},
+	"donators": {
+		"title": ["donators"],
+		"description": "List users that support Quote on Patreon.",
+		"examples": ["donators"]
+	},
 	"quote": {
 		"title": ["quote", "q"],
 		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
@@ -58,10 +63,5 @@
 		"title": ["snipe"],
 		"description": "Snipe the last deleted message from a specified channel. Defaults to the current channel.",
 		"examples": ["snipe", "snipe #general"]
-	},
-	"donators": {
-		"title": ["donators"],
-		"description": "List users that support Quote on Patreon.",
-		"examples": ["donators"]
 	}
 }

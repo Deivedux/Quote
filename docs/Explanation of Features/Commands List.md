@@ -2,6 +2,19 @@
 *Some commands may require special server permissions to execute.*
 
 
+## Help
+
+|Command|`>help`|
+|---|---|
+|Description|Show details on a specific command.|
+|Example|`>help`|
+
+|Command|`>donators`|
+|---|---|
+|Description|List users that support Quote on Patreon.|
+|Example|`>donators`|
+
+
 ## Quoting
 
 |Command|`>quote` / `>q`|
