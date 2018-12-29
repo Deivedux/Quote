@@ -111,3 +111,10 @@
 |---|---|
 |Description|Shuts down the bot.|
 |Example|`>shutdown`|
+
+
+## Others
+
+|Command|`>donators`|
+|Description|Shows list of all donators.|
+|Example|`>donators`|
