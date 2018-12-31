@@ -56,42 +56,18 @@ class PersonalQuotes:
 
 		if response and ctx.message.attachments:
 			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				try:
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-					conn.commit()
-				except sqlite3.OperationalError:
-					c.execute("ALTER TABLE PersonalQuotes ADD COLUMN Attachments TEXT")
-
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-					conn.commit()
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
+				conn.commit()
 			else:
-				try:
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-					conn.commit()
-				except sqlite3.OperationalError:
-					c.execute("ALTER TABLE PersonalQuotes ADD COLUMN Attachments TEXT")
-
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-					conn.commit()
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
+				conn.commit()
 		elif not response and ctx.message.attachments:
 			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				try:
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-					conn.commit()
-				except sqlite3.OperationalError:
-					c.execute("ALTER TABLE PersonalQuotes ADD COLUMN Attachments TEXT")
-
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-					conn.commit()
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
+				conn.commit()
 			else:
-				try:
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-					conn.commit()
-				except sqlite3.OperationalError:
-					c.execute("ALTER TABLE PersonalQuotes ADD COLUMN Attachments TEXT")
-
-					c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-					conn.commit()
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
+				conn.commit()
 		else:
 			c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "')")
 			conn.commit()
@@ -114,11 +90,8 @@ class PersonalQuotes:
 		if not user_quote:
 			await ctx.send(content = error_string + ' **No quote with that trigger exist.**')
 		else:
-			if ctx.guild and ctx.guild.id in del_commands:
-				try:
-					await ctx.message.delete()
-				except discord.Forbidden:
-					pass
+			if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+				await ctx.message.delete()
 
 			await ctx.send(embed = personal_embed(user_quote, ctx.author))
 
