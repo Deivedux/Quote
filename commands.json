@@ -37,7 +37,7 @@
 	"personal": {
 		"title": ["personal", "p"],
 		"description": "Execute your personal quote with a chosen trigger.",
-		"examples": ["p my trigger"]
+		"examples": ["p trigger"]
 	},
 	"personallist": {
 		"title": ["personallist", "plist"],
