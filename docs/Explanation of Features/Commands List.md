@@ -77,7 +77,7 @@
 |Command|`>personal` / `>p`|
 |---|---|
 |Description|Execute your personal quote with a chosen trigger.|
-|Example|`>p my trigger`|
+|Example|`>p trigger`|
 
 |Command|`>personallist` / `>plist`|
 |---|---|
