@@ -64,6 +64,11 @@
 |Description|Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.|
 |Example|`>padd trigger response` or `>padd "my trigger" my response`|
 
+|Command|`>qradd` / `>qr`|
+|---|---|
+|Description|Same as `>personaladd`, but instead creates a QR code based on the response of your trigger. Lesser characters - better performance; it is highly recommended to use a link shortener in your response, especially if it's a long link.|
+|Example|`>qradd trigger response`|
+
 |Command|`>personalremove` / `>premove` / `>prem`|
 |---|---|
 |Description|Remove your personal quote with a specified trigger.|
@@ -72,7 +77,7 @@
 |Command|`>personal` / `>p`|
 |---|---|
 |Description|Execute your personal quote with a chosen trigger.|
-|Example|`>p my trigger`|
+|Example|`>p trigger`|
 
 |Command|`>personallist` / `>plist`|
 |---|---|

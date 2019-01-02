@@ -24,6 +24,11 @@
 		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.",
 		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
 	},
+	"qradd": {
+		"title": ["qradd", "qr"],
+		"description": "Same as `{0}personaladd`, but instead creates a QR code based on the response of your trigger. Lesser characters - better performance; it is highly recommended to use a link shortener in your response, especially if it's a long link.",
+		"examples": ["qradd trigger response"]
+	},
 	"personalremove": {
 		"title": ["personalremove", "premove", "prem"],
 		"description": "Remove your personal quote with a specified trigger.",
@@ -32,7 +37,7 @@
 	"personal": {
 		"title": ["personal", "p"],
 		"description": "Execute your personal quote with a chosen trigger.",
-		"examples": ["p my trigger"]
+		"examples": ["p trigger"]
 	},
 	"personallist": {
 		"title": ["personallist", "plist"],
