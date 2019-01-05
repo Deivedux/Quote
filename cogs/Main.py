@@ -107,7 +107,7 @@ class Main:
 		if message:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('e', 'е'))
+				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
@@ -128,7 +128,7 @@ class Main:
 		else:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('e', 'е'))
+				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):
