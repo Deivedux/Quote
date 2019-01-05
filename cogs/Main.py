@@ -69,14 +69,15 @@ class Main:
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)
 
-			try:
-				message = await channel.get_message(payload.message_id)
-			except discord.NotFound:
-				return
-			except discord.Forbidden:
-				return
-			else:
-				await channel.send(embed = quote_embed(channel, message, user))
+			if user.permissions_in(channel).send_messages:
+				try:
+					message = await channel.get_message(payload.message_id)
+				except discord.NotFound:
+					return
+				except discord.Forbidden:
+					return
+				else:
+					await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
