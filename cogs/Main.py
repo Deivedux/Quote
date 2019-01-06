@@ -69,14 +69,15 @@ class Main:
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)
 
-			try:
-				message = await channel.get_message(payload.message_id)
-			except discord.NotFound:
-				return
-			except discord.Forbidden:
-				return
-			else:
-				await channel.send(embed = quote_embed(channel, message, user))
+			if user.permissions_in(channel).send_messages:
+				try:
+					message = await channel.get_message(payload.message_id)
+				except discord.NotFound:
+					return
+				except discord.Forbidden:
+					return
+				else:
+					await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
@@ -106,7 +107,7 @@ class Main:
 		if message:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
+				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
@@ -127,7 +128,7 @@ class Main:
 		else:
 			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply)
+				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):

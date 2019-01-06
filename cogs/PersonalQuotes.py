@@ -86,8 +86,7 @@ class PersonalQuotes:
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **QR code must not be empty.**')
 
-		payload = urllib.parse.urlencode({'cht': 'qr', 'chs': '200x200', 'chld': 'L|1', 'chl': response})
-		qr_url = 'https://chart.googleapis.com/chart?' + payload
+		qr_url = 'https://chart.googleapis.com/chart?' + urllib.parse.urlencode({'cht': 'qr', 'chs': '200x200', 'chld': 'L|1', 'chl': response})
 		c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
 		conn.commit()
 
