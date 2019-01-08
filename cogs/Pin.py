@@ -20,6 +20,22 @@ with open('configs/config.json') as json_data:
 	error_string = response_json['response_string']['error']
 	del response_json
 
+def pin_embed(message):
+	embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
+	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
+	if message.attachments:
+		if message.channel.is_nsfw() and not context_channel.is_nsfw():
+			embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
+		elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
+			embed.set_image(url = message.attachments[0].url)
+		else:
+			attachment_count = 0
+			for attachment in message.attachments:
+				attachment_count+=1
+				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
+
+	return embed
+
 class Pin:
 	def __init__(self, bot):
 		self.bot = bot
@@ -52,20 +68,24 @@ class Pin:
 					if str(payload.message_id) in msg.content:
 						return
 
-				embed = discord.Embed(description = message.content, color = 0xD4AC0D, timestamp = message.created_at)
-				embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(payload.guild_id) + '/' + str(payload.channel_id) + '/' + str(payload.message_id))
-				if message.attachments:
-					if message.channel.is_nsfw() and not context_channel.is_nsfw():
-						embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
-					elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-						embed.set_image(url = message.attachments[0].url)
-					else:
-						attachment_count = 0
-						for attachment in message.attachments:
-							attachment_count+=1
-							embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
+				await channel.send(content = '📌 **Message ID:** ' + str(payload.message_id) + ' | ' + pin_channel.mention, embed = pin_embed(message))
 
-				await channel.send(content = '📌 **Message ID:** ' + str(payload.message_id) + ' | ' + pin_channel.mention, embed = embed)
+	async def on_raw_message_edit(self, payload):
+		if int(payload.data['guild_id']) in pin_channels.keys() and int(payload.data['channel_id']) != pin_channels[int(payload.data['guild_id'])]:
+			async for msg in self.bot.get_channel(pin_channels[int(payload.data['guild_id'])]).history(limit = 100):
+				if str(payload.message_id) in msg.content:
+					message = msg
+					break
+
+			source_message = await self.bot.get_channel(int(payload.data['channel_id'])).get_message(payload.message_id)
+
+			await message.edit(embed = pin_embed(source_message))
+
+	async def on_raw_message_delete(self, payload):
+		if payload.guild_id in pin_channels.keys():
+			async for msg in self.bot.get_channel(pin_channels[payload.guild_id]).history(limit = 100):
+				if str(payload.message_id) in msg.content:
+					return await msg.delete()
 
 	@commands.command(aliases = ['pinc'])
 	async def pinchannel(self, ctx, channel: discord.TextChannel = None):
