@@ -14,11 +14,6 @@
 		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
 		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply"]
 	},
-	"quotechannel": {
-		"title": ["quotechannel", "quotechan", "qchan", "qc"],
-		"description": "Quote a message using a message ID from a specific channel.",
-		"examples": ["qc #channel 492444904681897986 My reply!"]
-	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
 		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.",

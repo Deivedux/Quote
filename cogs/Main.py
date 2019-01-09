@@ -116,25 +116,6 @@ class Main:
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
-	@commands.command(aliases = ['quotechan', 'qchan', 'qc'])
-	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int = None, *, reply = None):
-		if not msg_id:
-			return await ctx.send(content = error_string + ' **Please specify a message ID to quote, and if you did, make sure that the first argument is a channel to quote the message from.**')
-
-		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
-			await ctx.message.delete()
-
-		try:
-			message = await channel.get_message(msg_id)
-		except discord.NotFound:
-			await ctx.send(content = error_string + ' **Could not find the specified message.**')
-		except discord.Forbidden:
-			await ctx.send(content = error_string + ' **I do not have enough permissions to get the message.**')
-		else:
-			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
-
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):
 		if not ctx.guild:
