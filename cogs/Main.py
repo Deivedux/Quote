@@ -94,7 +94,10 @@ class Main:
 				except discord.Forbidden:
 					return
 				else:
-					await channel.send(embed = quote_embed(channel, message, user))
+					if not message.content and message.embeds and message.author.bot:
+						await channel.send(content = 'Raw embed from `' + str(message.author).strip('`') + '` in ' + message.channel.mention, embed = quote_embed(channel, message, user))
+					else:
+						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
