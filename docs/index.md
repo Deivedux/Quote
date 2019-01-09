@@ -69,8 +69,10 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 ## Self-Host
 * If you'd like to selfhost Quote, you are more than welcome to by following a guide corresponding to your operating system.
-[**Linux**](https://quote.readthedocs.io/en/latest/Guides/Linux%20Guide/)
-[**Windows**](https://quote.readthedocs.io/en/latest/Guides/Windows%20Guide/)
+
+[**Linux Guide**](https://quote.readthedocs.io/en/latest/Guides/Linux%20Guide/)
+
+[**Windows Guide**](https://quote.readthedocs.io/en/latest/Guides/Windows%20Guide/)
 
 
 
