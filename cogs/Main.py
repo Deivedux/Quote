@@ -72,12 +72,12 @@ class Main:
 
 		try:
 			del_commands.remove(guild.id)
-		except KeyError:
+		except ValueError:
 			pass
 
 		try:
 			on_reaction.remove(guild.id)
-		except KeyError:
+		except ValueError:
 			pass
 
 	async def on_raw_reaction_add(self, payload):
