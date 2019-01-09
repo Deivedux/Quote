@@ -4,21 +4,7 @@ from cogs.OwnerOnly import blacklist_ids
 
 def quote_embed(context_channel, message, user):
 	if not message.content and message.embeds and message.author.bot:
-		message_embed = message.embeds[0]
-		embed = discord.Embed(title = message_embed.title, description = message_embed.description, url = message_embed.url, color = message_embed.color, timestamp = message.created_at)
-		if message_embed.image:
-			if message.channel.is_nsfw() and not context_channel.is_nsfw():
-				pass
-			else:
-				embed.set_image(url = message_embed.image.url)
-		if message_embed.thumbnail:
-			if message.channel.is_nsfw() and not context_channel.is_nsfw():
-				pass
-			else:
-				embed.set_thumbnail(url = message_embed.image.url)
-		if message_embed.fields:
-			for field in message_embed.fields:
-				embed.add_field(name = field.name, value = field.value, inline = field.inline)
+		embed = message.embeds[0]
 	else:
 		if message.author not in message.guild.members or message.author.color == discord.Colour.default():
 			embed = discord.Embed(description = message.content, timestamp = message.created_at)
@@ -32,9 +18,8 @@ def quote_embed(context_channel, message, user):
 			else:
 				for attachment in message.attachments:
 					embed.add_field(name = 'Attachment', value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
-
-	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
-	embed.set_footer(text = 'Linked by: ' + str(user))
+		embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
+		embed.set_footer(text = 'Linked by: ' + str(user))
 
 	return embed
 
@@ -76,7 +61,10 @@ class MessageURL:
 					except:
 						continue
 					else:
-						await message.channel.send(embed = quote_embed(message.channel, msg_found, message.author))
+						if not msg_found.content and msg_found.embeds and msg_found.author.bot:
+							await message.channel.send(content = 'Raw embed from `' + str(msg_found.author).strip('`') + '` in ' + msg_found.channel.mention, embed = quote_embed(message.channel, msg_found, message.author))
+						else:
+							await message.channel.send(embed = quote_embed(message.channel, msg_found, message.author))
 
 
 def setup(bot):
