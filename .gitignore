@@ -1,5 +1,4 @@
 configs/*.db
-configs/config.json
 cogs/__pycache__
 discord/__pycache__
 discord/ext/commands/__pycache__
