@@ -65,6 +65,21 @@ class Main:
 		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
 		conn.commit()
 
+		try:
+			del prefixes[guild.id]
+		except KeyError:
+			pass
+
+		try:
+			del_commands.remove(guild.id)
+		except KeyError:
+			pass
+
+		try:
+			on_reaction.remove(guild.id)
+		except KeyError:
+			pass
+
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
 			guild = self.bot.get_guild(payload.guild_id)
