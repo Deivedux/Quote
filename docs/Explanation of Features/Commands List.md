@@ -24,7 +24,7 @@
 
 |Command|`>quotepart` / `>qp`|
 |---|---|
-|Description|Quote part of the message by specifying the exact words that message contains (case insensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `>quote`.|
+|Description|Quote part of the message by specifying the exact words that message contains (case sensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `>quote`.|
 |Example|`>qp "quote these words"`|
 
 |Command|`>snipe`|

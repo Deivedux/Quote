@@ -142,7 +142,7 @@ class Main:
 		message = None
 		async with ctx.typing():
 			async for msg in ctx.channel.history(limit = 1000, before = ctx.message):
-				if part_msg.lower() in msg.content.lower():
+				if part_msg in msg.content:
 					message = msg
 					break
 

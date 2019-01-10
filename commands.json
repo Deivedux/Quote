@@ -16,7 +16,7 @@
 	},
 	"quotepart": {
 		"title": ["quotepart", "qp"],
-		"description": "Quote part of the message by specifying the exact words that message contains (case insensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `{0}quote`.",
+		"description": "Quote part of the message by specifying the exact words that message contains (case sensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `{0}quote`.",
 		"examples": ["`>qp \"quote these words\"`"]
 	},
 	"personaladd": {
