@@ -3,22 +3,24 @@ from discord.ext import commands
 from cogs.OwnerOnly import blacklist_ids
 
 def quote_embed(context_channel, message, user):
-	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
-		embed = discord.Embed(description = message.content, timestamp = message.created_at)
+	if not message.content and message.embeds and message.author.bot:
+		embed = message.embeds[0]
 	else:
-		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
-	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
-	if message.attachments:
-		if message.channel.is_nsfw() and not context_channel.is_nsfw():
-			embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
-		elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-			embed.set_image(url = message.attachments[0].url)
+		if message.author not in message.guild.members or message.author.color == discord.Colour.default():
+			embed = discord.Embed(description = message.content, timestamp = message.created_at)
 		else:
-			attachment_count = 0
-			for attachment in message.attachments:
-				attachment_count+=1
-				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
-	embed.set_footer(text = 'Linked by: ' + str(user))
+			embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
+		if message.attachments:
+			if message.channel.is_nsfw() and not context_channel.is_nsfw():
+				embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
+			elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
+				embed.set_image(url = message.attachments[0].url)
+			else:
+				for attachment in message.attachments:
+					embed.add_field(name = 'Attachment', value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
+		embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
+		embed.set_footer(text = 'Linked by: ' + str(user))
+
 	return embed
 
 class MessageURL:
@@ -59,7 +61,10 @@ class MessageURL:
 					except:
 						continue
 					else:
-						await message.channel.send(embed = quote_embed(message.channel, msg_found, message.author))
+						if not msg_found.content and msg_found.embeds and msg_found.author.bot:
+							await message.channel.send(content = 'Raw embed from `' + str(msg_found.author).strip('`') + '` in ' + msg_found.channel.mention, embed = quote_embed(message.channel, msg_found, message.author))
+						else:
+							await message.channel.send(embed = quote_embed(message.channel, msg_found, message.author))
 
 
 def setup(bot):

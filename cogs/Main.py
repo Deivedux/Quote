@@ -30,25 +30,27 @@ with open('configs/config.json') as json_data:
 	del response_json
 
 def quote_embed(context_channel, message, user):
-	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
-		embed = discord.Embed(description = message.content, timestamp = message.created_at)
+	if not message.content and message.embeds and message.author.bot:
+		embed = message.embeds[0]
 	else:
-		embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
-	embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
-	if message.attachments:
-		if message.channel.is_nsfw() and not context_channel.is_nsfw():
-			embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
-		elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-			embed.set_image(url = message.attachments[0].url)
+		if message.author not in message.guild.members or message.author.color == discord.Colour.default():
+			embed = discord.Embed(description = message.content, timestamp = message.created_at)
 		else:
-			attachment_count = 0
-			for attachment in message.attachments:
-				attachment_count+=1
-				embed.add_field(name = 'Attachment ' + str(attachment_count), value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
-	if message.channel != context_channel:
-		embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name)
-	else:
-		embed.set_footer(text = 'Quoted by: ' + str(user))
+			embed = discord.Embed(description = message.content, color = message.author.color, timestamp = message.created_at)
+		if message.attachments:
+			if message.channel.is_nsfw() and not context_channel.is_nsfw():
+				embed.add_field(name = 'Attachments', value = ':underage: **Quoted message belongs in NSFW channel.**')
+			elif len(message.attachments) == 1 and message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
+				embed.set_image(url = message.attachments[0].url)
+			else:
+				for attachment in message.attachments:
+					embed.add_field(name = 'Attachment', value = '[' + attachment.filename + '](' + attachment.url + ')', inline = False)
+		embed.set_author(name = str(message.author), icon_url = message.author.avatar_url, url = 'https://discordapp.com/channels/' + str(message.guild.id) + '/' + str(message.channel.id) + '/' + str(message.id))
+		if message.channel != context_channel:
+			embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name)
+		else:
+			embed.set_footer(text = 'Quoted by: ' + str(user))
+
 	return embed
 
 class Main:
@@ -62,6 +64,21 @@ class Main:
 	async def on_guild_remove(self, guild):
 		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
 		conn.commit()
+
+		try:
+			del prefixes[guild.id]
+		except KeyError:
+			pass
+
+		try:
+			del_commands.remove(guild.id)
+		except ValueError:
+			pass
+
+		try:
+			on_reaction.remove(guild.id)
+		except ValueError:
+			pass
 
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
@@ -77,14 +94,17 @@ class Main:
 				except discord.Forbidden:
 					return
 				else:
-					await channel.send(embed = quote_embed(channel, message, user))
+					if not message.content and message.embeds and message.author.bot:
+						await channel.send(content = 'Raw embed from `' + str(message.author).strip('`') + '` in ' + message.channel.mention, embed = quote_embed(channel, message, user))
+					else:
+						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
 		if not msg_id:
 			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
 
-		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
 		message = None
@@ -105,30 +125,32 @@ class Main:
 						break
 
 		if message:
-			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
+			if not message.content and message.embeds and message.author.bot:
+				await ctx.send(content = 'Raw embed from `' + str(message.author).strip('`') + '` in ' + message.channel.mention, embed = quote_embed(ctx.channel, message, ctx.author))
+			else:
+				await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
 			if reply:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
-	@commands.command(aliases = ['quotechan', 'qchan', 'qc'])
-	async def quotechannel(self, ctx, channel: discord.TextChannel, msg_id: int = None, *, reply = None):
-		if not msg_id:
-			return await ctx.send(content = error_string + ' **Please specify a message ID to quote, and if you did, make sure that the first argument is a channel to quote the message from.**')
-
-		if ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+	@commands.command(aliases = ['qp'])
+	async def quotepart(self, ctx, part_msg, *, reply = None):
+		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
-		try:
-			message = await channel.get_message(msg_id)
-		except discord.NotFound:
-			await ctx.send(content = error_string + ' **Could not find the specified message.**')
-		except discord.Forbidden:
-			await ctx.send(content = error_string + ' **I do not have enough permissions to get the message.**')
-		else:
-			await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-			if reply:
-				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
+		message = None
+		async with ctx.typing():
+			async for msg in ctx.channel.history(limit = 1000, before = ctx.message):
+				if part_msg in msg.content:
+					message = msg
+					break
+
+			if message:
+				message.content = part_msg
+				await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
+			else:
+				await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):

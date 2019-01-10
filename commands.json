@@ -14,10 +14,10 @@
 		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
 		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply"]
 	},
-	"quotechannel": {
-		"title": ["quotechannel", "quotechan", "qchan", "qc"],
-		"description": "Quote a message using a message ID from a specific channel.",
-		"examples": ["qc #channel 492444904681897986 My reply!"]
+	"quotepart": {
+		"title": ["quotepart", "qp"],
+		"description": "Quote part of the message by specifying the exact words that message contains (case sensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `{0}quote`.",
+		"examples": ["`>qp \"quote these words\"`"]
 	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
