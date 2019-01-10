@@ -22,6 +22,11 @@
 |Description|Quote a message using a message ID, and optionally leave your own reply to a quoted message.|
 |Example|`>quote 426100904874213387` or `>q 426100904874213387 This is my reply`|
 
+|Command|`>quotepart` / `>qp`|
+|---|---|
+|Description|Quote part of the message by specifying the exact words that message contains (case insensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `>quote`.|
+|Example|`>qp "quote these words"`|
+
 |Command|`>snipe`|
 |---|---|
 |Description|Snipe the last deleted message from the specified channel. Defaults to current channel.|
