@@ -77,12 +77,13 @@ class Pin:
 					message = msg
 					break
 
-			source_message = await self.bot.get_channel(int(payload.data['channel_id'])).get_message(payload.message_id)
+			if message:
+				source_message = await self.bot.get_channel(int(payload.data['channel_id'])).get_message(payload.message_id)
 
-			try:
-				await message.edit(embed = pin_embed(source_message))
-			except UnboundLocalError:
-				pass
+				try:
+					await message.edit(embed = pin_embed(source_message))
+				except UnboundLocalError:
+					pass
 
 	async def on_raw_message_delete(self, payload):
 		if payload.guild_id in pin_channels.keys():
