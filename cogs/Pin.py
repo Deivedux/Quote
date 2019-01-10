@@ -72,6 +72,7 @@ class Pin:
 
 	async def on_raw_message_edit(self, payload):
 		if int(payload.data['guild_id']) in pin_channels.keys() and int(payload.data['channel_id']) != pin_channels[int(payload.data['guild_id'])]:
+			message = None
 			async for msg in self.bot.get_channel(pin_channels[int(payload.data['guild_id'])]).history(limit = 50):
 				if str(payload.message_id) in msg.content:
 					message = msg
