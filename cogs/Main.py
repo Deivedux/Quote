@@ -111,18 +111,17 @@ class Main:
 		try:
 			message = await ctx.channel.get_message(msg_id)
 		except:
-			async with ctx.typing():
-				for channel in ctx.guild.text_channels:
-					perms = ctx.guild.me.permissions_in(channel)
-					if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
-						continue
+			for channel in ctx.guild.text_channels:
+				perms = ctx.guild.me.permissions_in(channel)
+				if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
+					continue
 
-					try:
-						message = await channel.get_message(msg_id)
-					except:
-						continue
-					else:
-						break
+				try:
+					message = await channel.get_message(msg_id)
+				except:
+					continue
+				else:
+					break
 
 		if message:
 			if not message.content and message.embeds and message.author.bot:
