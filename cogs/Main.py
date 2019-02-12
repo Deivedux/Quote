@@ -134,24 +134,6 @@ class Main:
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
-	@commands.command(aliases = ['qp'])
-	async def quotepart(self, ctx, part_msg, *, reply = None):
-		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
-			await ctx.message.delete()
-
-		message = None
-		async with ctx.typing():
-			async for msg in ctx.channel.history(limit = 1000, before = ctx.message):
-				if part_msg in msg.content:
-					message = msg
-					break
-
-			if message:
-				message.content = part_msg
-				await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-			else:
-				await ctx.send(content = error_string + ' **Could not find the specified message.**')
-
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):
 		if not ctx.guild:
