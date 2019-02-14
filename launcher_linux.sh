@@ -16,7 +16,7 @@ if [ "$choice" = "1" ] ; then
     echo ""
     echo "Checking requirements.."
     sleep 5s
-    curl https://raw.githubusercontent.com/kyo-rh/QuoteRequirements/master/reqs.sh | sh
+    curl https://raw.githubusercontent.com/vfx-looks-of-cute-things/QuoteRequirements/master/reqs.sh | sh
     echo ""
     echo "Done!"
     echo "Starting the bot.."
@@ -24,7 +24,7 @@ if [ "$choice" = "1" ] ; then
     python3 quote.py
 else
     if [ "$choice" = "2" ] ; then
-        curl https://raw.githubusercontent.com/kyo-rh/QuoteRequirements/master/reqs.sh | sh
+        curl https://raw.githubusercontent.com/vfx-looks-of-cute-things/QuoteRequirements/master/reqs.sh | sh
         echo "Starting the bot with auto restart.."
         sh autorestart_linux.sh
         exit 1

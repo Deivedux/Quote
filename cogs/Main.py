@@ -100,6 +100,7 @@ class Main:
 						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
+	@commands.cooldown(1, 3, type = commands.BucketType.channel)
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
 		if not msg_id:
 			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
@@ -111,18 +112,17 @@ class Main:
 		try:
 			message = await ctx.channel.get_message(msg_id)
 		except:
-			async with ctx.typing():
-				for channel in ctx.guild.text_channels:
-					perms = ctx.guild.me.permissions_in(channel)
-					if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
-						continue
+			for channel in ctx.guild.text_channels:
+				perms = ctx.guild.me.permissions_in(channel)
+				if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
+					continue
 
-					try:
-						message = await channel.get_message(msg_id)
-					except:
-						continue
-					else:
-						break
+				try:
+					message = await channel.get_message(msg_id)
+				except:
+					continue
+				else:
+					break
 
 		if message:
 			if not message.content and message.embeds and message.author.bot:
@@ -133,24 +133,6 @@ class Main:
 				await ctx.send(content = '**' + ctx.author.display_name + '\'s reply:**\n' + reply.replace('@everyone', '@еveryone').replace('@here', '@hеre'))
 		else:
 			await ctx.send(content = error_string + ' **Could not find the specified message.**')
-
-	@commands.command(aliases = ['qp'])
-	async def quotepart(self, ctx, part_msg, *, reply = None):
-		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
-			await ctx.message.delete()
-
-		message = None
-		async with ctx.typing():
-			async for msg in ctx.channel.history(limit = 1000, before = ctx.message):
-				if part_msg in msg.content:
-					message = msg
-					break
-
-			if message:
-				message.content = part_msg
-				await ctx.send(embed = quote_embed(ctx.channel, message, ctx.author))
-			else:
-				await ctx.send(content = error_string + ' **Could not find the specified message.**')
 
 	@commands.command()
 	async def prefix(self, ctx, *, prefix = None):

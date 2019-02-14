@@ -12,25 +12,25 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 ## Quoting 
 
-* You can quote messages by reacting with 💬 (`:speech_balloon:`) to them (this feature needs to be enable first by using the `>reactions` command).
+* You can quote messages by reacting with 💬 (`:speech_balloon:`) to them (this feature needs to be enabled first by using the `>reactions` command).
 
 * You can quote messages from any channel by using the `>quote` command, like this: `>quote 507103646995972096 My Optional Reply`, where the number is the ID of the message you want to quote.
 
-  * To get message IDs you need to enable Developer Mode in Discord >settings >Appearance >Developer Mode, and right click on a message >Copy ID.
+  * To get message IDs you need to enable Developer Mode in your `User Settings` -> `Appearance` > `Developer Mode`, and right click on a message then `Copy ID`.
 
   * ![Developer Mode](https://cdn.discordapp.com/attachments/154295458531901441/526118407071072281/unknown.png)
 
   * ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
 
-* You can now quote by directly sending a link to a message, Quote will automatically embed the linked message.
+* You can now quote by directly sending a link to a message. Quote will automatically embed the linked message.
 
-  * To obtain the link to a message enable Developer Mode as described above and click on the three dots to the right of a message, there will be a Copy Link option.
+  * To obtain the link to a message enable `Developer Mode`, as described above, and click on the three dots to the right of a message, there will be a `Copy Link` option.
 
   * ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
 
 * The footer contains useful information on the requester, channel of the original message and timestamp of the original message.
 
-* The Original Poster name in the quote is actually a clickable link to the original message.
+* The `Original Poster` name in the quote is actually a clickable link to the original message.
 
 * The bot supports quoting of regular messages sent either by users or other bots, but also supports quoting messages containing single or multiple files attachments.
   * If the original message has a single image as an attachment Quote will automatically embed it.
@@ -42,28 +42,30 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 
 ## Pinning
-* You can define a pin channel by running the command `>pinchannel #myChannel`, and have the bot embed there any message to which you add a 📌 (`:pushpin:`) reaction to. (Only users with Manage Messages permission can use this to avoid spam.)
+* You can define a pin channel by running the command `>pinchannel #myChannel`, and have the bot embed any message on which you add a 📌 (`:pushpin:`) reaction to. (Only users with `Manage Messages` permission can use this to avoid spam.)
 
 
 
 ## Snipe
-* Never seen an unread message notification in a channel to then find nothing there? Quote will allow users with Manage Messages permission to check the last deleted message in a channel.
-  * Use the command `>snipe` to show last deleted message in the current channel.
-  * Add a channel identifier `>snipe #myChannel` to see last deleted message in #myChannel.
+* Ever seen an unread message notification in a channel, but only to find nothing? Quote will allow users with `Manage Messages` permission to check the last deleted message in a channel.
+* Use the command `>snipe` to show last deleted message in the current channel.
+* Add a channel identifier `>snipe #myChannel` to see last deleted message in #myChannel.
 
 
 
 ## Custom Prefix
-* Don't like `>` as your server's prefix? You can change it by using `>prefix <your custom prefix>` eg: `>prefix !`.
+* Don't like `>` as your server's prefix? You can change it by running the command `>prefix <your custom prefix>` eg: `>prefix !`.
 
 
 
 ## Help
 * The bot comes with a `>help` function that shows the list of all available commands. 
-* You can type `>help <exampleCommand>` to see more information about each command. 
+* You can type `>help <exampleCommand>` to see more information about that command. 
+
+
 
 ##  Anti-Bot Farm
-* Quote will leave any server with more than 20 members that has more than 70% of the population composed of Bots.
+* Quote will leave any server that has 20+ members, of which 70% are bots.
 
 
 
@@ -77,9 +79,11 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 
 ## New Features
-* Interested in what the new features are/will be? Head over to our [**Trello**](https://trello.com/b/Cuazpsh8/quote-bot) under `In Progress`, `Needs Testing` and `Planned` lists.
+* Interested in what the new features are/will be?
+
+Head over to our [**Trello**](https://trello.com/b/Cuazpsh8/quote-bot) under the Board `In Progress`, `Needs Testing` and `Planned` lists.
 
 
 
 ## Suggestions
-* Have a suggestion? Join our [**Support Server**](https://discord.gg/sbySHxA) and head over to #suggestions. Follow the template to submit your own suggestion.
+* Have a suggestion? Join our [**Support Server**](https://discord.gg/sbySHxA) and head over to `#suggestions`, where you can find a template on how to suggest new features/request changes of old features.
