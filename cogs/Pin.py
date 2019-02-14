@@ -70,28 +70,6 @@ class Pin:
 
 				await channel.send(content = '📌 **Message ID:** ' + str(payload.message_id) + ' | ' + pin_channel.mention, embed = pin_embed(message))
 
-	async def on_raw_message_edit(self, payload):
-		if int(payload.data['guild_id']) in pin_channels.keys() and int(payload.data['channel_id']) != pin_channels[int(payload.data['guild_id'])]:
-			message = None
-			async for msg in self.bot.get_channel(pin_channels[int(payload.data['guild_id'])]).history(limit = 50):
-				if str(payload.message_id) in msg.content:
-					message = msg
-					break
-
-			if message:
-				source_message = await self.bot.get_channel(int(payload.data['channel_id'])).get_message(payload.message_id)
-
-				try:
-					await message.edit(embed = pin_embed(source_message))
-				except UnboundLocalError:
-					pass
-
-	async def on_raw_message_delete(self, payload):
-		if payload.guild_id in pin_channels.keys():
-			async for msg in self.bot.get_channel(pin_channels[payload.guild_id]).history(limit = 50):
-				if str(payload.message_id) in msg.content:
-					return await msg.delete()
-
 	@commands.command(aliases = ['pinc'])
 	async def pinchannel(self, ctx, channel: discord.TextChannel = None):
 		if not ctx.guild or not ctx.author.guild_permissions.manage_guild:
