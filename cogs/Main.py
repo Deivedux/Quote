@@ -100,7 +100,7 @@ class Main:
 						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
-	@commands.cooldown(1, 2, type = commands.BucketType.channel)
+	@commands.cooldown(1, 3, type = commands.BucketType.channel)
 	async def quote(self, ctx, msg_id: int = None, *, reply = None):
 		if not msg_id:
 			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
