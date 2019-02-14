@@ -36,6 +36,8 @@ class MessageURL:
 			word = i.lower().strip('<>')
 			if word.startswith('https://canary.discordapp.com/channels/'):
 				word = word.strip('https://canary.discordapp.com/channels/')
+			elif word.startswith('https://ptb.discordapp.com/channels/'):
+				word = word.strip('https://ptb.discordapp.com/channels/')
 			elif word.startswith('https://discordapp.com/channels/'):
 				word = word.strip('https://discordapp.com/channels/')
 			else:
