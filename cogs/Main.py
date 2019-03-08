@@ -53,14 +53,16 @@ def quote_embed(context_channel, message, user):
 
 	return embed
 
-class Main:
+class Main(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@commands.Cog.listener()
 	async def on_ready(self):
 		c.execute("DELETE FROM ServerConfig WHERE Guild NOT IN (" + ', '.join([str(guild.id) for guild in self.bot.guilds]) + ")")
 		conn.commit()
 
+	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
 		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
 		conn.commit()
@@ -80,6 +82,7 @@ class Main:
 		except ValueError:
 			pass
 
+	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
 			guild = self.bot.get_guild(payload.guild_id)
