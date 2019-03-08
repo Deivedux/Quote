@@ -3,7 +3,7 @@
 """
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Rapptz
+Copyright (c) 2015-2019 Rapptz
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -49,6 +49,8 @@ class VoiceState:
         Indicates if the user is currently muted by their own accord.
     self_deaf: :class:`bool`
         Indicates if the user is currently deafened by their own accord.
+    self_video: :class:`bool`
+        Indicates if the user is currently broadcasting video.
     afk: :class:`bool`
         Indicates if the user is currently in the AFK channel in the guild.
     channel: :class:`VoiceChannel`
@@ -57,7 +59,7 @@ class VoiceState:
     """
 
     __slots__ = ('session_id', 'deaf', 'mute', 'self_mute',
-                 'self_deaf', 'afk', 'channel')
+                 'self_video', 'self_deaf', 'afk', 'channel')
 
     def __init__(self, *, data, channel=None):
         self.session_id = data.get('session_id')
@@ -66,13 +68,14 @@ class VoiceState:
     def _update(self, data, channel):
         self.self_mute = data.get('self_mute', False)
         self.self_deaf = data.get('self_deaf', False)
+        self.self_video = data.get('self_video', False)
         self.afk = data.get('suppress', False)
         self.mute = data.get('mute', False)
         self.deaf = data.get('deaf', False)
         self.channel = channel
 
     def __repr__(self):
-        return '<VoiceState self_mute={0.self_mute} self_deaf={0.self_deaf} channel={0.channel!r}>'.format(self)
+        return '<VoiceState self_mute={0.self_mute} self_deaf={0.self_deaf} self_video={0.self_video} channel={0.channel!r}>'.format(self)
 
 def flatten_user(cls):
     for attr, value in itertools.chain(BaseUser.__dict__.items(), User.__dict__.items()):
@@ -135,12 +138,9 @@ class Member(discord.abc.Messageable, _BaseUser):
 
     Attributes
     ----------
-    joined_at: `datetime.datetime`
+    joined_at: Optional[:class:`datetime.datetime`]
         A datetime object that specifies the date and time in UTC that the member joined the guild for
-        the first time.
-    status : :class:`Status`
-        The member's status. There is a chance that the status will be a :class:`str`
-        if it is a value that is not recognised by the enumerator.
+        the first time. In certain cases, this can be ``None``.
     activities: Tuple[Union[:class:`Game`, :class:`Streaming`, :class:`Spotify`, :class:`Activity`]]
         The activities that the user is currently doing.
     guild: :class:`Guild`
@@ -149,7 +149,7 @@ class Member(discord.abc.Messageable, _BaseUser):
         The guild specific nickname of the user.
     """
 
-    __slots__ = ('_roles', 'joined_at', 'status', 'activities', 'guild', 'nick', '_user', '_state')
+    __slots__ = ('_roles', 'joined_at', '_client_status', 'activities', 'guild', 'nick', '_user', '_state')
 
     def __init__(self, *, data, guild, state):
         self._state = state
@@ -157,7 +157,9 @@ class Member(discord.abc.Messageable, _BaseUser):
         self.guild = guild
         self.joined_at = utils.parse_time(data.get('joined_at'))
         self._update_roles(data)
-        self.status = Status.offline
+        self._client_status = {
+            None: Status.offline
+        }
         self.activities = tuple(map(create_activity, data.get('activities', [])))
         self.nick = data.get('nick', None)
 
@@ -178,12 +180,22 @@ class Member(discord.abc.Messageable, _BaseUser):
         return hash(self._user)
 
     @classmethod
+    def _from_message(cls, *, message, data):
+        author = message.author
+        data['user'] = {
+            attr: getattr(author, attr)
+            for attr in author.__slots__
+            if attr[0] != '_'
+        }
+        return cls(data=data, guild=message.guild, state=message._state)
+
+    @classmethod
     def _copy(cls, member):
         self = cls.__new__(cls) # to bypass __init__
 
         self._roles = utils.SnowflakeList(member._roles, is_sorted=True)
         self.joined_at = member.joined_at
-        self.status = member.status
+        self._client_status = member._client_status.copy()
         self.guild = member.guild
         self.nick = member.nick
         self.activities = member.activities
@@ -215,14 +227,47 @@ class Member(discord.abc.Messageable, _BaseUser):
         self._update_roles(data)
 
     def _presence_update(self, data, user):
-        self.status = try_enum(Status, data['status'])
         self.activities = tuple(map(create_activity, data.get('activities', [])))
+        self._client_status = {
+            key: value
+            for key, value in data.get('client_status', {}).items()
+        }
+        self._client_status[None] = data['status']
 
         if len(user) > 1:
             u = self._user
             u.name = user.get('username', u.name)
             u.avatar = user.get('avatar', u.avatar)
             u.discriminator = user.get('discriminator', u.discriminator)
+
+    @property
+    def status(self):
+        """:class:`Status`: The member's overall status. If the value is unknown, then it will be a :class:`str` instead."""
+        return try_enum(Status, self._client_status[None])
+
+    @status.setter
+    def status(self, value):
+        # internal use only
+        self._client_status[None] = str(value)
+
+    @property
+    def mobile_status(self):
+        """:class:`Status`: The member's status on a mobile device, if applicable."""
+        return try_enum(Status, self._client_status.get('mobile', 'offline'))
+
+    @property
+    def desktop_status(self):
+        """:class:`Status`: The member's status on the desktop client, if applicable."""
+        return try_enum(Status, self._client_status.get('desktop', 'offline'))
+
+    @property
+    def web_status(self):
+        """:class:`Status`: The member's status on the web client, if applicable."""
+        return try_enum(Status, self._client_status.get('web', 'offline'))
+
+    def is_on_mobile(self):
+        """:class:`bool`: A helper function that determines if a member is active on a mobile device."""
+        return 'mobile' in self._client_status
 
     @property
     def colour(self):
