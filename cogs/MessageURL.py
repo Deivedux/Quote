@@ -23,10 +23,11 @@ def quote_embed(context_channel, message, user):
 
 	return embed
 
-class MessageURL:
+class MessageURL(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@commands.Cog.listener()
 	async def on_message(self, message):
 		perms = message.guild.me.permissions_in(message.channel)
 		if not perms.send_messages or not perms.embed_links or message.author.bot or message.author.id in blacklist_ids:

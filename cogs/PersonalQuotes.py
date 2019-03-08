@@ -40,7 +40,7 @@ def list_embed(list_personals, author):
 	embed.set_author(name = 'My Quotes', icon_url = author.avatar_url)
 	return embed
 
-class PersonalQuotes:
+class PersonalQuotes(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 

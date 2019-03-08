@@ -18,7 +18,7 @@ with open('configs/config.json') as json_data:
 	error_string = response_json['response_string']['error']
 	del response_json
 
-class Owneronly:
+class Owneronly(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 

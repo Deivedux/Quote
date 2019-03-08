@@ -25,22 +25,25 @@ def snipe_embed(context_channel, message, user):
 		embed.set_footer(text = 'Sniped by: ' + str(user))
 	return embed
 
-class Snipe:
+class Snipe(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
 		try:
 			del snipes[guild.id]
 		except KeyError:
 			pass
 
+	@commands.Cog.listener()
 	async def on_guild_channel_delete(self, channel):
 		try:
 			del snipes[channel.guild.id][channel.id]
 		except KeyError:
 			pass
 
+	@commands.Cog.listener()
 	async def on_message_delete(self, message):
 		if message.guild and not message.author.bot:
 			try:

@@ -36,10 +36,11 @@ def pin_embed(message):
 
 	return embed
 
-class Pin:
+class Pin(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '📌' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot:
 			guild = self.bot.get_guild(payload.guild_id)
