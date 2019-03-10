@@ -3,6 +3,7 @@ import datetime
 import asyncio
 import sqlite3
 import json
+import aiohttp
 from discord.ext import commands
 from cogs.OwnerOnly import blacklist_ids
 
@@ -218,6 +219,35 @@ class Main(commands.Cog):
 			on_reaction.remove(ctx.guild.id)
 
 			await ctx.send(content = success_string + ' **Quoting messages on reaction disabled.**')
+
+	@commands.command(aliases = ['dupe'])
+	@commands.has_permissions(manage_guild = True)
+	async def duplicate(self, ctx, msgs: int, channel: discord.TextChannel):
+		if not ctx.guild.me.permissions_in(ctx.channel).manage_webhooks:
+
+			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the current channel**')
+
+		elif not ctx.guild.me.permissions_in(channel).read_messages or not ctx.guild.me.permissions_in(channel).read_message_history:
+
+			await ctx.send(content = error_string + ' **I do not have permissions to fetch messages in ' + channel.mention + '.**')
+
+		else:
+
+			if msgs > 100:
+				msgs = 100
+
+			messages = list()
+			async for msg in channel.history(limit = msgs, before = ctx.message, reverse = True):
+				messages.append(msg)
+
+			webhook = await ctx.channel.create_webhook(name = 'Message Duplicator')
+
+			for msg in messages:
+				async with aiohttp.ClientSession() as session:
+					webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
+					await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+
+			await webhook.delete()
 
 
 def setup(bot):

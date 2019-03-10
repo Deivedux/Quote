@@ -59,6 +59,11 @@
 		"description": "Toggle whether to let users quote messages by adding :speech_balloon: reaction to them.",
 		"examples": ["reactions"]
 	},
+	"duplicate": {
+		"title": ["duplicate", "dupe"],
+		"description": "Duplicate messages from the provided channel to the current with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from. User requires `Manage Server` permission to execute.",
+		"examples": ["dupe 20 #chat"]
+	},
 	"pinchannel": {
 		"title": ["pinchannel", "pinc"],
 		"description": "Set a channel that will be used for pinning messages. Members with Manage Messages permission can react with :pushpin: to pin a message.",
