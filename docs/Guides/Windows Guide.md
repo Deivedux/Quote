@@ -28,24 +28,26 @@
 
 # Installing Quote
 
-> Once you've installed the requirements, head over [here](https://aki-toga.tk/quote) to download the Windows installer.
+> Once you've installed the requirements, head over [here](https://aki-toga.tk/quote/download) to download the Windows installer.
 
 > **Note: Your anti-virus and Windows SmartScreen might block `setup.exe` AKA Windows installer. Add an exception to your anti-virus and run anyway when Windows SmartScreen prompts you!**
 
 > After the installer has downloaded, there will be a dialog which will prompt you about Quote's guidelines. Click `Yes` after you've read the guidelines to continue.
 
-> Click `Check For Updates` to download the latest version of Quote bot. Once it's complete, fill out your `config.json` in the next step.
+> Click `Check For Updates` to download the latest version of Quote bot. Once it's complete, fill out your `config.json` by pressing `Edit JSON`. *Refer to the GIF below.*
 
-> Filled out the `config.json`? Alright, to launch the bot, all you have to do is press `Launch`. *Refer to GIFs below.*
+> Filled out the `config.json`? Alright, to launch the bot, all you have to do is press `Launch`. *Refer to the GIF below.*
 
 > Downloading:
 
-![](https://i.imgur.com/KUJFu1a.gif)
+![](https://aki-toga.tk/quote/Download.gif)
 
+> Editing `config.json`:
+![](https://aki-toga.tk/quote/Edit%20JSON.gif)
 
 > Launching:
 
-![](https://i.imgur.com/Whn2DQg.gif)
+![](https://aki-toga.tk/quote/Launching.gif)
 
 ---
 
