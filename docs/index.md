@@ -78,12 +78,5 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 
 
-## New Features
-* Interested in what the new features are/will be?
-
-Head over to our [**Trello**](https://trello.com/b/Cuazpsh8/quote-bot) under the Board `In Progress`, `Needs Testing` and `Planned` lists.
-
-
-
 ## Suggestions
 * Have a suggestion? Join our [**Support Server**](https://discord.gg/sbySHxA) and head over to `#suggestions`, where you can find a template on how to suggest new features/request changes of old features.
