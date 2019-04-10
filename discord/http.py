@@ -89,7 +89,7 @@ class HTTPClient:
     def __init__(self, connector=None, *, proxy=None, proxy_auth=None, loop=None):
         self.loop = asyncio.get_event_loop() if loop is None else loop
         self.connector = connector
-        self._session = None # filled in static_login
+        self.__session = None # filled in static_login
         self._locks = weakref.WeakValueDictionary()
         self._global_over = asyncio.Event(loop=self.loop)
         self._global_over.set()
@@ -102,10 +102,10 @@ class HTTPClient:
         self.user_agent = user_agent.format(__version__, sys.version_info, aiohttp.__version__)
 
     def recreate(self):
-        if self._session.closed:
-            self._session = aiohttp.ClientSession(connector=self.connector, loop=self.loop)
+        if self.__session.closed:
+            self.__session = aiohttp.ClientSession(connector=self.connector, loop=self.loop)
 
-    async def request(self, route, *, header_bypass_delay=None, **kwargs):
+    async def request(self, route, *, files=None, header_bypass_delay=None, **kwargs):
         bucket = route.bucket
         method = route.method
         url = route.url
@@ -151,7 +151,11 @@ class HTTPClient:
         await lock.acquire()
         with MaybeUnlock(lock) as maybe_lock:
             for tries in range(5):
-                async with self._session.request(method, url, **kwargs) as r:
+                if files:
+                    for f in files:
+                        f.reset(seek=tries)
+
+                async with self.__session.request(method, url, **kwargs) as r:
                     log.debug('%s %s with %s has returned %s', method, url, kwargs.get('data'), r.status)
 
                     # even errors have text involved in them so this is safe to call
@@ -177,6 +181,10 @@ class HTTPClient:
 
                     # we are being rate limited
                     if r.status == 429:
+                        if not isinstance(data, dict):
+                            # Banned by Cloudflare more than likely.
+                            raise HTTPException(r, data)
+
                         fmt = 'We are being rate limited. Retrying in %.2f seconds. Handled under the bucket "%s"'
 
                         # sleep a bit
@@ -216,22 +224,22 @@ class HTTPClient:
             # We've run out of retries, raise.
             raise HTTPException(r, data)
 
-    async def get_attachment(self, url):
-        async with self._session.get(url) as resp:
+    async def get_from_cdn(self, url):
+        async with self.__session.get(url) as resp:
             if resp.status == 200:
                 return await resp.read()
             elif resp.status == 404:
-                raise NotFound(resp, 'attachment not found')
+                raise NotFound(resp, 'asset not found')
             elif resp.status == 403:
-                raise Forbidden(resp, 'cannot retrieve attachment')
+                raise Forbidden(resp, 'cannot retrieve asset')
             else:
-                raise HTTPException(resp, 'failed to get attachment')
+                raise HTTPException(resp, 'failed to get asset')
 
     # state management
 
     async def close(self):
-        if self._session:
-            await self._session.close()
+        if self.__session:
+            await self.__session.close()
 
     def _token(self, token, *, bot=True):
         self.token = token
@@ -242,7 +250,7 @@ class HTTPClient:
 
     async def static_login(self, token, *, bot):
         # Necessary to get aiohttp to stop complaining about session creation
-        self._session = aiohttp.ClientSession(connector=self.connector, loop=self.loop)
+        self.__session = aiohttp.ClientSession(connector=self.connector, loop=self.loop)
         old_token, old_bot = self.token, self.bot_token
         self._token(token, bot=bot)
 
@@ -334,13 +342,13 @@ class HTTPClient:
 
         form.add_field('payload_json', utils.to_json(payload))
         if len(files) == 1:
-            fp = files[0]
-            form.add_field('file', fp[0], filename=fp[1], content_type='application/octet-stream')
+            file = files[0]
+            form.add_field('file', file.fp, filename=file.filename, content_type='application/octet-stream')
         else:
-            for index, (buffer, filename) in enumerate(files):
-                form.add_field('file%s' % index, buffer, filename=filename, content_type='application/octet-stream')
+            for index, file in enumerate(files):
+                form.add_field('file%s' % index, file.fp, filename=file.filename, content_type='application/octet-stream')
 
-        return self.request(r, data=form)
+        return self.request(r, data=form, files=files)
 
     async def ack_message(self, channel_id, message_id):
         r = Route('POST', '/channels/{channel_id}/messages/{message_id}/ack', channel_id=channel_id, message_id=message_id)
@@ -405,11 +413,11 @@ class HTTPClient:
             'limit': limit
         }
 
-        if before:
+        if before is not None:
             params['before'] = before
-        if after:
+        if after is not None:
             params['after'] = after
-        if around:
+        if around is not None:
             params['around'] = around
 
         return self.request(Route('GET', '/channels/{channel_id}/messages', channel_id=channel_id), params=params)
@@ -549,8 +557,23 @@ class HTTPClient:
 
     # Guild management
 
+    def get_guilds(self, limit, before=None, after=None):
+        params = {
+            'limit': limit
+        }
+
+        if before:
+            params['before'] = before
+        if after:
+            params['after'] = after
+
+        return self.request(Route('GET', '/users/@me/guilds'), params=params)
+
     def leave_guild(self, guild_id):
         return self.request(Route('DELETE', '/users/@me/guilds/{guild_id}', guild_id=guild_id))
+
+    def get_guild(self, guild_id):
+        return self.request(Route('GET', '/guilds/{guild_id}', guild_id=guild_id))
 
     def delete_guild(self, guild_id):
         return self.request(Route('DELETE', '/guilds/{guild_id}', guild_id=guild_id))
@@ -589,6 +612,9 @@ class HTTPClient:
         payload = {'code': code}
         return self.request(Route('PATCH', '/guilds/{guild_id}/vanity-url', guild_id=guild_id), json=payload, reason=reason)
 
+    def get_member(self, guild_id, member_id):
+        return self.request(Route('GET', '/guilds/{guild_id}/members/{member_id}', guild_id=guild_id, member_id=member_id))
+
     def prune_members(self, guild_id, days, *, reason=None):
         params = {
             'days': days
@@ -600,6 +626,12 @@ class HTTPClient:
             'days': days
         }
         return self.request(Route('GET', '/guilds/{guild_id}/prune', guild_id=guild_id), params=params)
+
+    def get_all_custom_emojis(self, guild_id):
+        return self.request(Route('GET', '/guilds/{guild_id}/emojis', guild_id=guild_id))
+
+    def get_custom_emoji(self, guild_id, emoji_id):
+        return self.request(Route('GET', '/guilds/{guild_id}/emojis/{emoji_id}', guild_id=guild_id, emoji_id=emoji_id))
 
     def create_custom_emoji(self, guild_id, name, image, *, roles=None, reason=None):
         payload = {
@@ -636,6 +668,9 @@ class HTTPClient:
 
         r = Route('GET', '/guilds/{guild_id}/audit-logs', guild_id=guild_id)
         return self.request(r, params=params)
+
+    def get_widget(self, guild_id):
+        return self.request(Route('GET', '/guilds/{guild_id}/widget.json', guild_id=guild_id))
 
     # Invite management
 
@@ -784,3 +819,6 @@ class HTTPClient:
 
     def leave_hypesquad_house(self):
         return self.request(Route('DELETE', '/hypesquad/online'))
+
+    def edit_settings(self, **payload):
+        return self.request(Route('PATCH', '/users/@me/settings'), json=payload)

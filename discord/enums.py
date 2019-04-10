@@ -24,13 +24,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from enum import Enum, IntEnum
+from enum import Enum
 
 __all__ = ['ChannelType', 'MessageType', 'VoiceRegion', 'SpeakingState',
            'VerificationLevel', 'ContentFilter', 'Status', 'DefaultAvatar',
            'RelationshipType', 'AuditLogAction', 'AuditLogActionCategory',
            'UserFlags', 'ActivityType', 'HypeSquadHouse', 'NotificationLevel',
-           'PremiumType']
+           'PremiumType', 'UserContentFilter', 'FriendFlags', 'Theme']
 
 class ChannelType(Enum):
     text     = 0
@@ -39,6 +39,7 @@ class ChannelType(Enum):
     group    = 3
     category = 4
     news     = 5
+    store    = 6
 
     def __str__(self):
         return self.name
@@ -77,7 +78,7 @@ class VoiceRegion(Enum):
     def __str__(self):
         return self.value
 
-class SpeakingState(IntEnum):
+class SpeakingState(Enum):
     none       = 0
     voice      = 1
     soundshare = 2
@@ -86,7 +87,7 @@ class SpeakingState(IntEnum):
     def __str__(self):
         return self.name
 
-class VerificationLevel(IntEnum):
+class VerificationLevel(Enum):
     none              = 0
     low               = 1
     medium            = 2
@@ -98,13 +99,29 @@ class VerificationLevel(IntEnum):
     def __str__(self):
         return self.name
 
-class ContentFilter(IntEnum):
+class ContentFilter(Enum):
     disabled    = 0
     no_role     = 1
     all_members = 2
 
     def __str__(self):
         return self.name
+
+class UserContentFilter(Enum):
+    disabled    = 0
+    friends     = 1
+    all_messages = 2
+
+class FriendFlags(Enum):
+    noone = 0
+    mutual_guilds = 1
+    mutual_friends = 2
+    guild_and_friends = 3
+    everyone = 4
+
+class Theme(Enum):
+    light = 'light'
+    dark = 'dark'
 
 class Status(Enum):
     online = 'online'
@@ -134,7 +151,7 @@ class RelationshipType(Enum):
     incoming_request = 3
     outgoing_request = 4
 
-class NotificationLevel(IntEnum):
+class NotificationLevel(Enum):
     all_messages  = 0
     only_mentions = 1
 
@@ -235,7 +252,7 @@ class UserFlags(Enum):
     hypesquad_balance = 256
     early_supporter = 512
 
-class ActivityType(IntEnum):
+class ActivityType(Enum):
     unknown = -1
     playing = 0
     streaming = 1

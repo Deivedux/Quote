@@ -38,6 +38,7 @@ import re
 import warnings
 
 from .errors import InvalidArgument
+from .object import Object
 
 DISCORD_EPOCH = 1420070400000
 
@@ -104,14 +105,14 @@ def oauth_url(client_id, permissions=None, guild=None, redirect_uri=None):
 
     Parameters
     -----------
-    client_id : str
+    client_id: :class:`str`
         The client ID for your bot.
-    permissions : :class:`Permissions`
+    permissions: :class:`Permissions`
         The permissions you're requesting. If not given then you won't be requesting any
         permissions.
-    guild : :class:`Guild`
+    guild: :class:`Guild`
         The guild to pre-select in the authorization screen, if available.
-    redirect_uri : str
+    redirect_uri: :class:`str`
         An optional valid redirect URI.
     """
     url = 'https://discordapp.com/oauth2/authorize?client_id={}&scope=bot'.format(client_id)
@@ -139,7 +140,7 @@ def time_snowflake(datetime_obj, high=False):
     -----------
     datetime_obj
         A timezone-naive datetime object representing UTC time.
-    high
+    high: :class:`bool`
         Whether or not to set the lower 22 bit to high or low.
     """
     unix_seconds = (datetime_obj - type(datetime_obj)(1970, 1, 1)).total_seconds()
@@ -166,7 +167,7 @@ def find(predicate, seq):
     -----------
     predicate
         A function that returns a boolean-like result.
-    seq : iterable
+    seq: iterable
         The iterable to search through.
     """
 
@@ -340,3 +341,93 @@ def _string_width(string, *, _IS_ASCII=_IS_ASCII):
     for char in string:
         width += 2 if func(char) in UNICODE_WIDE_CHAR_TYPE else 1
     return width
+
+def resolve_invite(invite):
+    """
+    Resolves an invite from a :class:`Invite`, URL or ID
+
+    Parameters
+    -----------
+    invite: Union[:class:`Invite`, :class:`Object`, :class:`str`]
+        The invite.
+
+    Returns
+    --------
+    :class:`str`
+        The invite code.
+    """
+    from .invite import Invite  # circular import
+    if isinstance(invite, Invite) or isinstance(invite, Object):
+        return invite.id
+    else:
+        rx = r'(?:https?\:\/\/)?discord(?:\.gg|app\.com\/invite)\/(.+)'
+        m = re.match(rx, invite)
+        if m:
+            return m.group(1)
+    return invite
+
+_MARKDOWN_ESCAPE_SUBREGEX = '|'.join(r'\{0}(?=([\s\S]*((?<!\{0})\{0})))'.format(c)
+                                     for c in ('*', '`', '_', '~', '|'))
+
+_MARKDOWN_ESCAPE_REGEX = re.compile(r'(?P<markdown>%s)' % _MARKDOWN_ESCAPE_SUBREGEX)
+
+def escape_markdown(text, *, as_needed=False, ignore_links=True):
+    r"""A helper function that escapes Discord's markdown.
+
+    Parameters
+    -----------
+    text: :class:`str`
+        The text to escape markdown from.
+    as_needed: :class:`bool`
+        Whether to escape the markdown characters as needed. This
+        means that it does not escape extraneous characters if it's
+        not necessary, e.g. ``**hello**`` is escaped into ``\*\*hello**``
+        instead of ``\*\*hello\*\*``. Note however that this can open
+        you up to some clever syntax abuse. Defaults to ``False``.
+    ignore_links: :class:`bool`
+        Whether to leave links alone when escaping markdown. For example,
+        if a URL in the text contains characters such as ``_`` then it will
+        be left alone. This option is not supported with ``as_needed``.
+        Defaults to ``True``.
+
+    Returns
+    --------
+    :class:`str`
+        The text with the markdown special characters escaped with a slash.
+    """
+
+    if not as_needed:
+        url_regex = r'(?P<url>(?:https?|steam)://(?:-\.)?(?:[^\s/?\.#-]+\.?)+(?:/[^\s]*)?)'
+        def replacement(match):
+            groupdict = match.groupdict()
+            is_url = groupdict.get('url')
+            if is_url:
+                return is_url
+            return '\\' + groupdict['markdown']
+
+        regex = r'(?P<markdown>[_\\~|\*`])'
+        if ignore_links:
+            regex = '(?:%s|%s)' % (url_regex, regex)
+        return re.sub(regex, replacement, text)
+    else:
+        text = re.sub(r'\\', r'\\\\', text)
+        return _MARKDOWN_ESCAPE_REGEX.sub(r'\\\1', text)
+
+def escape_mentions(text):
+    """A helper function that escapes everyone, here, role, and user mentions.
+
+    .. note::
+
+        This does not include channel mentions.
+
+    Parameters
+    -----------
+    text: :class:`str`
+        The text to escape mentions from.
+
+    Returns
+    --------
+    :class:`str`
+        The text with the mentions removed.
+    """
+    return re.sub(r'@(everyone|here|[!&]?[0-9]{17,21})', '@\u200b\\1', text)

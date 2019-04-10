@@ -43,6 +43,7 @@ class Shard:
     def __init__(self, ws, client):
         self.ws = ws
         self._client = client
+        self._dispatch = client.dispatch
         self.loop = self._client.loop
         self._current = self.loop.create_future()
         self._current.set_result(None) # we just need an already done future
@@ -79,6 +80,7 @@ class Shard:
             log.info('Got a request to RESUME the websocket at Shard ID %s.', self.id)
             coro = DiscordWebSocket.from_client(self._client, resume=True, shard_id=self.id,
                                                 session=self.ws.session_id, sequence=self.ws.sequence)
+            self._dispatch('disconnect')
             self.ws = await asyncio.wait_for(coro, timeout=180.0, loop=self.loop)
 
     def get_future(self):
@@ -192,7 +194,7 @@ class AutoShardedClient(Client):
 
         Parameters
         -----------
-        \*guilds
+        \*guilds: :class:`Guild`
             An argument list of guilds to request offline members for.
 
         Raises
@@ -313,11 +315,11 @@ class AutoShardedClient(Client):
         status: Optional[:class:`Status`]
             Indicates what status to change to. If None, then
             :attr:`Status.online` is used.
-        afk: bool
+        afk: :class:`bool`
             Indicates if you are going AFK. This allows the discord
             client to know how to handle push notifications better
             for you in case you are actually idle and not lying.
-        shard_id: Optional[int]
+        shard_id: Optional[:class:`int`]
             The shard_id to change the presence to. If not specified
             or ``None``, then it will change the presence of every
             shard the bot can see.
