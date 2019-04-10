@@ -32,12 +32,13 @@ def personal_embed(db_response, author):
 	embed.set_footer(text = 'Personal Quote')
 	return embed
 
-def list_embed(list_personals, author):
+def list_embed(list_personals, author, page_number):
 	if isinstance(author, discord.Member) and author.color != discord.Colour.default():
 		embed = discord.Embed(description = '\n'.join(['• `' + i[1] + '`' for i in list_personals]), color = author.color)
 	else:
 		embed = discord.Embed(description = '\n'.join(['• `' + i[1] + '`' for i in list_personals]))
 	embed.set_author(name = 'My Quotes', icon_url = author.avatar_url)
+	embed.set_footer(text = 'Page: ' + str(page_number))
 	return embed
 
 class PersonalQuotes(commands.Cog):
@@ -46,10 +47,8 @@ class PersonalQuotes(commands.Cog):
 
 	@commands.command(aliases = ['padd'])
 	async def personaladd(self, ctx, trigger, *, response = None):
-		user_quotes = c.execute("SELECT Trigger FROM PersonalQuotes WHERE User = " + str(ctx.author.id)).fetchall()
-		if len(user_quotes) >= 10:
-			return await ctx.send(content = error_string + ' **You have already exceeded your personal quotes limit.**')
-		elif trigger in [i[0] for i in user_quotes]:
+		db_response = c.execute("SELECT Trigger FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
+		if db_response:
 			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		if not response and not ctx.message.attachments:
@@ -77,10 +76,8 @@ class PersonalQuotes(commands.Cog):
 
 	@commands.command(aliases = ['qr'])
 	async def qradd(self, ctx, trigger, *, response = None):
-		user_quotes = c.execute("SELECT Trigger FROM PersonalQuotes WHERE User = " + str(ctx.author.id)).fetchall()
-		if len(user_quotes) >= 10:
-			return await ctx.send(content = error_string + ' **You have already exceeded your personal quotes limit.**')
-		elif trigger in [i[0] for i in user_quotes]:
+		db_response = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
+		if db_response:
 			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		if not response and not ctx.message.attachments:
@@ -114,12 +111,12 @@ class PersonalQuotes(commands.Cog):
 			await ctx.send(embed = personal_embed(user_quote, ctx.author))
 
 	@commands.command(aliases = ['plist'])
-	async def personallist(self, ctx):
-		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id)).fetchall()
+	async def personallist(self, ctx, page_number: int = 1):
+		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " LIMIT 10 OFFSET " + str(10 * (page_number - 1))).fetchall()
 		if len(user_quotes) == 0:
-			await ctx.send(content = error_string + ' **You do not have any personal quotes.**')
+			await ctx.send(content = error_string + ' **No personal quotes on page ' + str(page_number) + '.**')
 		else:
-			await ctx.send(embed = list_embed(user_quotes, ctx.author))
+			await ctx.send(embed = list_embed(user_quotes, ctx.author, page_number))
 
 
 def setup(bot):
