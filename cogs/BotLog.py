@@ -14,12 +14,6 @@ class BotLog(commands.Cog):
 		self.bot = bot
 
 	@commands.Cog.listener()
-	async def on_shard_ready(self, shard_id):
-		async with aiohttp.ClientSession() as session:
-			webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
-			await webhook.send(content = ':ballot_box_with_check: **Shard #' + str(shard_id) + ' ready.**')
-
-	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
 		bots = [member for member in guild.members if member.bot]
 		async with aiohttp.ClientSession() as session:
