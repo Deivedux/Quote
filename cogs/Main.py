@@ -162,10 +162,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
 			await ctx.send(content = success_string + ' **Prefix changed to** `' + prefix + '`')
@@ -179,10 +178,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, DelCommands) VALUES (" + str(ctx.guild.id) + ", '1')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET DelCommands = '1' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			del_commands.append(ctx.guild.id)
 
 			await ctx.send(content = success_string + ' **Auto-delete of quote commands enabled.**')
@@ -204,10 +202,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, OnReaction) VALUES (" + str(ctx.guild.id) + ", '1')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET OnReaction = '1' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			on_reaction.append(ctx.guild.id)
 
 			await ctx.send(content = success_string + ' **Quoting messages on reaction enabled.**')

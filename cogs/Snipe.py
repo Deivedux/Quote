@@ -9,7 +9,7 @@ with open('configs/config.json') as json_data:
 	error_string = response_json['response_string']['error']
 	del response_json
 
-snipes = {}
+snipes = dict()
 
 def snipe_embed(context_channel, message, user):
 	if message.author not in message.guild.members or message.author.color == discord.Colour.default():
