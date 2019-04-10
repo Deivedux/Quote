@@ -62,7 +62,11 @@ async def on_ready():
 	print('------------')
 
 	while True:
-		await bot.change_presence(status = discord.Status.online, activity = discord.Activity(name = 'messages in ' + str(len(bot.guilds)) + ' servers', type = 3))
+		if len(bot.guilds) > 1:
+			await bot.change_presence(status = discord.Status.online, activity = discord.Activity(name = 'messages in ' + str(len(bot.guilds)) + ' servers', type = 3))
+		else:
+			await bot.change_presence(status = discord.Status.online, activity = discord.Activity(name = default_prefix + 'help', type = 1))
+
 		await asyncio.sleep(120)
 
 from cogs.OwnerOnly import blacklist_ids
