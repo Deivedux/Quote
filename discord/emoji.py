@@ -24,11 +24,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from collections import namedtuple
-
+from .asset import Asset
 from . import utils
+from .user import User
 
-class PartialEmoji(namedtuple('PartialEmoji', 'animated name id')):
+class PartialEmoji:
     """Represents a "partial" emoji.
 
     This model will be given in two scenarios:
@@ -65,7 +65,19 @@ class PartialEmoji(namedtuple('PartialEmoji', 'animated name id')):
         The ID of the custom emoji, if applicable.
     """
 
-    __slots__ = ()
+    __slots__ = ('animated', 'name', 'id', '_state')
+
+    def __init__(self, *, animated, name, id=None):
+        self.animated = animated
+        self.name = name
+        self.id = id
+        self._state = None
+
+    @classmethod
+    def with_state(cls, state, *, animated, name, id=None):
+        self = cls(animated=animated, name=name, id=id)
+        self._state = state
+        return self
 
     def __str__(self):
         if self.id is None:
@@ -80,6 +92,12 @@ class PartialEmoji(namedtuple('PartialEmoji', 'animated name id')):
 
         if isinstance(other, (PartialEmoji, Emoji)):
             return self.id == other.id
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.id, self.name))
 
     def is_custom_emoji(self):
         """Checks if this is a custom non-Unicode emoji."""
@@ -96,12 +114,13 @@ class PartialEmoji(namedtuple('PartialEmoji', 'animated name id')):
 
     @property
     def url(self):
-        """Returns a URL version of the emoji, if it is custom."""
+        """:class:`Asset`:Returns an asset of the emoji, if it is custom."""
         if self.is_unicode_emoji():
-            return None
+            return Asset(self._state)
 
         _format = 'gif' if self.animated else 'png'
-        return "https://cdn.discordapp.com/emojis/{0.id}.{1}".format(self, _format)
+        url = "https://cdn.discordapp.com/emojis/{0.id}.{1}".format(self, _format)
+        return Asset(self._state, url)
 
 class Emoji:
     """Represents a custom emoji.
@@ -146,8 +165,11 @@ class Emoji:
         If this emoji is managed by a Twitch integration.
     guild_id: :class:`int`
         The guild ID the emoji belongs to.
+    user: Optional[:class:`User`]
+        The user that created the emoji. This can only be retrieved using :meth:`Guild.fetch_emoji`.
     """
-    __slots__ = ('require_colons', 'animated', 'managed', 'id', 'name', '_roles', 'guild_id', '_state')
+    __slots__ = ('require_colons', 'animated', 'managed', 'id', 'name', '_roles', 'guild_id',
+                 '_state', 'user')
 
     def __init__(self, *, guild, state, data):
         self.guild_id = guild.id
@@ -161,6 +183,8 @@ class Emoji:
         self.name = emoji['name']
         self.animated = emoji.get('animated', False)
         self._roles = utils.SnowflakeList(map(int, emoji.get('roles', [])))
+        user = emoji.get('user')
+        self.user = User(state=self._state, data=user) if user else None
 
     def _iterator(self):
         for attr in self.__slots__:
@@ -183,6 +207,9 @@ class Emoji:
     def __eq__(self, other):
         return isinstance(other, (PartialEmoji, Emoji)) and self.id == other.id
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __hash__(self):
         return self.id >> 22
 
@@ -195,7 +222,8 @@ class Emoji:
     def url(self):
         """Returns a URL version of the emoji."""
         _format = 'gif' if self.animated else 'png'
-        return "https://cdn.discordapp.com/emojis/{0.id}.{1}".format(self, _format)
+        url = "https://cdn.discordapp.com/emojis/{0.id}.{1}".format(self, _format)
+        return Asset(self._state, url)
 
     @property
     def roles(self):
@@ -224,7 +252,7 @@ class Emoji:
 
         Parameters
         -----------
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for deleting this emoji. Shows up on the audit log.
 
         Raises
@@ -247,11 +275,11 @@ class Emoji:
 
         Parameters
         -----------
-        name: str
+        name: :class:`str`
             The new emoji name.
         roles: Optional[list[:class:`Role`]]
             A :class:`list` of :class:`Role`\s that can use this emoji. Leave empty to make it available to everyone.
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for editing this emoji. Shows up on the audit log.
 
         Raises

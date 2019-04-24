@@ -158,7 +158,7 @@ class Member(discord.abc.Messageable, _BaseUser):
         self.joined_at = utils.parse_time(data.get('joined_at'))
         self._update_roles(data)
         self._client_status = {
-            None: Status.offline
+            None: 'offline'
         }
         self.activities = tuple(map(create_activity, data.get('activities', [])))
         self.nick = data.get('nick', None)
@@ -190,6 +190,17 @@ class Member(discord.abc.Messageable, _BaseUser):
         return cls(data=data, guild=message.guild, state=message._state)
 
     @classmethod
+    def _from_presence_update(cls, *, data, guild, state):
+        clone = cls(data=data, guild=guild, state=state)
+        to_return = cls(data=data, guild=guild, state=state)
+        to_return._client_status = {
+            key: value
+            for key, value in data.get('client_status', {}).items()
+        }
+        to_return._client_status[None] = data['status']
+        return to_return, clone
+
+    @classmethod
     def _copy(cls, member):
         self = cls.__new__(cls) # to bypass __init__
 
@@ -200,7 +211,10 @@ class Member(discord.abc.Messageable, _BaseUser):
         self.nick = member.nick
         self.activities = member.activities
         self._state = member._state
-        self._user = User._copy(member._user)
+
+        # Reference will not be copied unless necessary by PRESENCE_UPDATE
+        # See below
+        self._user = member._user
         return self
 
     async def _get_channel(self):
@@ -210,13 +224,7 @@ class Member(discord.abc.Messageable, _BaseUser):
     def _update_roles(self, data):
         self._roles = utils.SnowflakeList(map(int, data['roles']))
 
-    def _update(self, data, user=None):
-        if user:
-            self._user.name = user['username']
-            self._user.discriminator = user['discriminator']
-            self._user.avatar = user['avatar']
-            self._user.bot = user.get('bot', False)
-
+    def _update(self, data):
         # the nickname change is optional,
         # if it isn't in the payload then it didn't change
         try:
@@ -236,9 +244,15 @@ class Member(discord.abc.Messageable, _BaseUser):
 
         if len(user) > 1:
             u = self._user
-            u.name = user.get('username', u.name)
-            u.avatar = user.get('avatar', u.avatar)
-            u.discriminator = user.get('discriminator', u.discriminator)
+            original = (u.name, u.avatar, u.discriminator)
+            # These keys seem to always be available
+            modified = (user['username'], user['avatar'], user['discriminator'])
+            if original != modified:
+                to_return = User._copy(self._user)
+                u.name, u.avatar, u.discriminator = modified
+                # Signal to dispatch on_user_update
+                return to_return, u
+        return False
 
     @property
     def status(self):
@@ -366,7 +380,7 @@ class Member(discord.abc.Messageable, _BaseUser):
 
         Parameters
         -----------
-        channel
+        channel: :class:`Channel`
             The channel to check your permissions for.
         """
         return channel.permissions_for(self)
@@ -457,17 +471,17 @@ class Member(discord.abc.Messageable, _BaseUser):
 
         Parameters
         -----------
-        nick: str
+        nick: Optional[:class:`str`]
             The member's new nickname. Use ``None`` to remove the nickname.
-        mute: bool
+        mute: Optional[:class:`bool`]
             Indicates if the member should be guild muted or un-muted.
-        deafen: bool
+        deafen: Optional[:class:`bool`]
             Indicates if the member should be guild deafened or un-deafened.
-        roles: List[:class:`Roles`]
+        roles: Optional[List[:class:`Roles`]]
             The member's new list of roles. This *replaces* the roles.
-        voice_channel: :class:`VoiceChannel`
+        voice_channel: Optional[:class:`VoiceChannel`]
             The voice channel to move the member to.
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for editing this member. Shows up on the audit log.
 
         Raises
@@ -533,7 +547,7 @@ class Member(discord.abc.Messageable, _BaseUser):
         -----------
         channel: :class:`VoiceChannel`
             The new voice channel to move the member to.
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for doing this action. Shows up on the audit log.
         """
         await self.edit(voice_channel=channel, reason=reason)
@@ -548,10 +562,10 @@ class Member(discord.abc.Messageable, _BaseUser):
 
         Parameters
         -----------
-        \*roles
+        \*roles: :class:`Snowflake`
             An argument list of :class:`abc.Snowflake` representing a :class:`Role`
             to give to the member.
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for adding these roles. Shows up on the audit log.
         atomic: bool
             Whether to atomically add roles. This will ensure that multiple
@@ -586,12 +600,12 @@ class Member(discord.abc.Messageable, _BaseUser):
 
         Parameters
         -----------
-        \*roles
+        \*roles: :class:`Snowflake`
             An argument list of :class:`abc.Snowflake` representing a :class:`Role`
             to remove from the member.
-        reason: Optional[str]
+        reason: Optional[:class:`str`]
             The reason for removing these roles. Shows up on the audit log.
-        atomic: bool
+        atomic: :class:`bool`
             Whether to atomically remove roles. This will ensure that multiple
             operations will always be applied regardless of the current
             state of the cache.

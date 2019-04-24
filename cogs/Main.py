@@ -92,7 +92,7 @@ class Main(commands.Cog):
 
 			if user.permissions_in(channel).send_messages:
 				try:
-					message = await channel.get_message(payload.message_id)
+					message = await channel.fetch_message(payload.message_id)
 				except discord.NotFound:
 					return
 				except discord.Forbidden:
@@ -114,7 +114,7 @@ class Main(commands.Cog):
 
 		message = None
 		try:
-			message = await ctx.channel.get_message(msg_id)
+			message = await ctx.channel.fetch_message(msg_id)
 		except:
 			for channel in ctx.guild.text_channels:
 				perms = ctx.guild.me.permissions_in(channel)
@@ -122,7 +122,7 @@ class Main(commands.Cog):
 					continue
 
 				try:
-					message = await channel.get_message(msg_id)
+					message = await channel.fetch_message(msg_id)
 				except:
 					continue
 				else:
@@ -162,10 +162,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			prefixes[ctx.guild.id] = prefix
 
 			await ctx.send(content = success_string + ' **Prefix changed to** `' + prefix + '`')
@@ -179,10 +178,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, DelCommands) VALUES (" + str(ctx.guild.id) + ", '1')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET DelCommands = '1' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			del_commands.append(ctx.guild.id)
 
 			await ctx.send(content = success_string + ' **Auto-delete of quote commands enabled.**')
@@ -204,10 +202,9 @@ class Main(commands.Cog):
 
 			try:
 				c.execute("INSERT INTO ServerConfig (Guild, OnReaction) VALUES (" + str(ctx.guild.id) + ", '1')")
-				conn.commit()
 			except sqlite3.IntegrityError:
 				c.execute("UPDATE ServerConfig SET OnReaction = '1' WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+			conn.commit()
 			on_reaction.append(ctx.guild.id)
 
 			await ctx.send(content = success_string + ' **Quoting messages on reaction enabled.**')
@@ -225,7 +222,7 @@ class Main(commands.Cog):
 	async def duplicate(self, ctx, msgs: int, channel: discord.TextChannel):
 		if not ctx.guild.me.permissions_in(ctx.channel).manage_webhooks:
 
-			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the current channel**')
+			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the current channel.**')
 
 		elif not ctx.guild.me.permissions_in(channel).read_messages or not ctx.guild.me.permissions_in(channel).read_message_history:
 
@@ -243,9 +240,12 @@ class Main(commands.Cog):
 			webhook = await ctx.channel.create_webhook(name = 'Message Duplicator')
 
 			for msg in messages:
-				async with aiohttp.ClientSession() as session:
-					webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
-					await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+				try:
+					async with aiohttp.ClientSession() as session:
+						webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
+						await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+				except:
+					pass
 
 			await webhook.delete()
 
