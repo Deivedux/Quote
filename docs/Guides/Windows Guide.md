@@ -40,14 +40,14 @@
 
 > Downloading:
 
-![](https://aki-toga.tk/quote/Download.gif)
+![](https://i.imgur.com/ClPfBB3.gif)
 
 > Editing `config.json`:
-![](https://aki-toga.tk/quote/Edit%20JSON.gif)
+![](https://i.imgur.com/SAkdLhp.gif)
 
 > Launching:
 
-![](https://aki-toga.tk/quote/Launching.gif)
+![](https://i.imgur.com/8DaO9ra.gif)
 
 ---
 
