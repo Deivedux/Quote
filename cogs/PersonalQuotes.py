@@ -2,6 +2,7 @@ import discord
 import sqlite3
 import json
 import urllib
+import re
 from discord.ext import commands
 from cogs.Main import del_commands
 
@@ -47,45 +48,34 @@ class PersonalQuotes(commands.Cog):
 
 	@commands.command(aliases = ['padd'])
 	async def personaladd(self, ctx, trigger, *, response = None):
-		db_response = c.execute("SELECT Trigger FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
-		if db_response:
-			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
-
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **You must include at least a response or an attachment in your message.**')
-
-		if response and ctx.message.attachments:
-			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
+		elif not ctx.message.attachments and (len(response.split()) == 1 and len(re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', response)) == 1 and response.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp'))):
+			try:
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "')")
 				conn.commit()
-			else:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-				conn.commit()
-		elif not response and ctx.message.attachments:
-			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-				conn.commit()
-			else:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-				conn.commit()
+			except sqlite3.IntegrityError:
+				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 		else:
-			c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "')")
-			conn.commit()
+			try:
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
+				conn.commit()
+			except sqlite3.IntegrityError:
+				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
 
 	@commands.command(aliases = ['qr'])
 	async def qradd(self, ctx, trigger, *, response = None):
-		db_response = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
-		if db_response:
-			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
-
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **QR code must not be empty.**')
 
 		qr_url = 'https://chart.googleapis.com/chart?' + urllib.parse.urlencode({'cht': 'qr', 'chs': '200x200', 'chld': 'L|1', 'chl': response})
-		c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
-		conn.commit()
+		try:
+			c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
+			conn.commit()
+		except:
+			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
 
