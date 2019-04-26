@@ -104,29 +104,47 @@ class Main(commands.Cog):
 						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
-	@commands.cooldown(1, 3, type = commands.BucketType.channel)
-	async def quote(self, ctx, msg_id: int = None, *, reply = None):
-		if not msg_id:
-			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
+	@commands.cooldown(2, 3, type = commands.BucketType.channel)
+	async def quote(self, ctx, msg_arg = None, *, reply = None):
+		if not msg_arg:
+			return await ctx.send(content = error_string + ' **Please provide a valid message argument.**')
 
 		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
 		message = None
 		try:
-			message = await ctx.channel.fetch_message(msg_id)
-		except:
-			for channel in ctx.guild.text_channels:
-				perms = ctx.guild.me.permissions_in(channel)
-				if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
-					continue
+			msg_arg = int(msg_arg)
+		except ValueError:
+			perms = ctx.guild.me.permissions_in(ctx.channel)
+			if perms.read_messages and perms.read_message_history:
+				async for msg in ctx.channel.history(limit = 100, before = ctx.message):
+					if msg_arg.lower() in msg.content.lower():
+						message = msg
+						break
+			if not message:
+				for channel in ctx.guild.text_channels:
+					perms = ctx.guild.me.permissions_in(channel)
+					if perms.read_messages and perms.read_message_history and channel != ctx.channel:
+						async for msg in channel.history(limit = 100):
+							if msg_arg.lower() in msg.content.lower():
+								message = msg
+								break
+		else:
+			try:
+				message = await ctx.channel.fetch_message(msg_arg)
+			except:
+				for channel in ctx.guild.text_channels:
+					perms = ctx.guild.me.permissions_in(channel)
+					if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
+						continue
 
-				try:
-					message = await channel.fetch_message(msg_id)
-				except:
-					continue
-				else:
-					break
+					try:
+						message = await channel.fetch_message(msg_arg)
+					except:
+						continue
+					else:
+						break
 
 		if message:
 			if not message.content and message.embeds and message.author.bot:
