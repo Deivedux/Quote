@@ -11,8 +11,8 @@
 	},
 	"quote": {
 		"title": ["quote", "q"],
-		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
-		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply"]
+		"description": "Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message.",
+		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply", "quote message this is my reply", "quote \"this message\" my reply"]
 	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
