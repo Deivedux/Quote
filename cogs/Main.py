@@ -59,15 +59,7 @@ class Main(commands.Cog):
 		self.bot = bot
 
 	@commands.Cog.listener()
-	async def on_ready(self):
-		c.execute("DELETE FROM ServerConfig WHERE Guild NOT IN (" + ', '.join([str(guild.id) for guild in self.bot.guilds]) + ")")
-		conn.commit()
-
-	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
-		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
-		conn.commit()
-
 		try:
 			del prefixes[guild.id]
 		except KeyError:
@@ -82,6 +74,22 @@ class Main(commands.Cog):
 			on_reaction.remove(guild.id)
 		except ValueError:
 			pass
+
+	@commands.Cog.listener()
+	async def on_guild_join(self, guild):
+		try:
+			c.execute("INSERT INTO ServerConfig (Guild) VALUES (" + str(guild.id) + ")")
+			conn.commit()
+		except sqlite3.IntegrityError:
+			pass
+
+		db_response = c.execute("SELECT * FROM ServerConfig WHERE Guild = " + str(guild.id)).fetchone()
+		if db_response[1] != None:
+			prefixes[int(db_response[0])] = str(db_response[1])
+		if db_response[2] != None:
+			del_commands.append(int(db_response[0]))
+		if db_response[3] != None:
+			on_reaction.append(int(db_response[0]))
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
@@ -122,14 +130,6 @@ class Main(commands.Cog):
 					if msg_arg.lower() in msg.content.lower():
 						message = msg
 						break
-			if not message:
-				for channel in ctx.guild.text_channels:
-					perms = ctx.guild.me.permissions_in(channel)
-					if perms.read_messages and perms.read_message_history and channel != ctx.channel:
-						async for msg in channel.history(limit = 100):
-							if msg_arg.lower() in msg.content.lower():
-								message = msg
-								break
 		else:
 			try:
 				message = await ctx.channel.fetch_message(msg_arg)
