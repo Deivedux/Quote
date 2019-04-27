@@ -258,12 +258,10 @@ class Main(commands.Cog):
 			webhook = await ctx.channel.create_webhook(name = 'Message Duplicator')
 
 			for msg in messages:
-				try:
-					async with aiohttp.ClientSession() as session:
-						webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
-						await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
-				except:
-					pass
+				async with aiohttp.ClientSession() as session:
+					webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
+					await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+				await asyncio.sleep(0.5)
 
 			await webhook.delete()
 

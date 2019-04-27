@@ -39,6 +39,11 @@
 		"description": "List your personal quotes.",
 		"examples": ["plist"]
 	},
+	"personalclear": {
+		"title": ["personalclear", "pclear"],
+		"description": "Deletes all your personal quotes.",
+		"examples": ["pclear"]
+	},
 	"prefix": {
 		"title": ["prefix"],
 		"description": "See currently set prefix, or change to a different prefix for this server.",
