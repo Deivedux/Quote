@@ -2,7 +2,6 @@ import discord
 import sqlite3
 import json
 import urllib
-import re
 from discord.ext import commands
 from cogs.Main import del_commands
 
@@ -50,12 +49,6 @@ class PersonalQuotes(commands.Cog):
 	async def personaladd(self, ctx, trigger, *, response = None):
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **You must include at least a response or an attachment in your message.**')
-		elif not ctx.message.attachments and (len(response.split()) == 1 and len(re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', response)) == 1 and response.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp'))):
-			try:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "')")
-				conn.commit()
-			except sqlite3.IntegrityError:
-				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 		else:
 			try:
 				c.execute("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")

@@ -16,7 +16,7 @@
 	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
-		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A response can be any number of attachments and/or a follow-up message after the trigger, or even a direct URL to an external image as your only response.",
+		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A response can be any number of attachments and/or a follow-up message after the trigger.",
 		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
 	},
 	"qradd": {
