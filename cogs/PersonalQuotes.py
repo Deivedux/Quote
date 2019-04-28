@@ -58,7 +58,7 @@ class PersonalQuotes(commands.Cog):
 				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 		else:
 			try:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join(['[' + attachment.filename + '](' + attachment.url + ')' for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
 				conn.commit()
 			except sqlite3.IntegrityError:
 				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')

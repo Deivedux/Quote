@@ -16,7 +16,7 @@
 	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
-		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.",
+		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A response can be any number of attachments and/or a follow-up message after the trigger, or even a direct URL to an external image as your only response.",
 		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
 	},
 	"qradd": {
@@ -36,8 +36,8 @@
 	},
 	"personallist": {
 		"title": ["personallist", "plist"],
-		"description": "List your personal quotes.",
-		"examples": ["plist"]
+		"description": "List your personal quotes. 10 quotes per page.",
+		"examples": ["plist", "plist 2"]
 	},
 	"personalclear": {
 		"title": ["personalclear", "pclear"],
