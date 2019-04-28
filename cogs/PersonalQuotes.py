@@ -97,7 +97,7 @@ class PersonalQuotes(commands.Cog):
 	async def personallist(self, ctx, page_number: int = 1):
 		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " LIMIT 10 OFFSET " + str(10 * (page_number - 1))).fetchall()
 		if len(user_quotes) == 0:
-			await ctx.send(content = error_string + ' **No personal quotes on page ' + str(page_number) + '.**')
+			await ctx.send(content = error_string + ' **No personal quotes on page `' + str(page_number) + '`**')
 		else:
 			await ctx.send(embed = list_embed(user_quotes, ctx.author, page_number))
 
