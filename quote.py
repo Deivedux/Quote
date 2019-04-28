@@ -10,7 +10,7 @@ c = conn.cursor()
 # Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT, PRIMARY KEY (User, Trigger))")
 c.execute("CREATE TABLE IF NOT EXISTS Donators (UserId INTEGER unique, UserTag TEXT)")
 
 from cogs.Main import prefixes

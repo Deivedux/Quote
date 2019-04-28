@@ -37,7 +37,7 @@ def list_embed(list_personals, author, page_number):
 		embed = discord.Embed(description = '\n'.join(['• `' + i[1] + '`' for i in list_personals]), color = author.color)
 	else:
 		embed = discord.Embed(description = '\n'.join(['• `' + i[1] + '`' for i in list_personals]))
-	embed.set_author(name = 'My Quotes', icon_url = author.avatar_url)
+	embed.set_author(name = 'Personal Quotes', icon_url = author.avatar_url)
 	embed.set_footer(text = 'Page: ' + str(page_number))
 	return embed
 
@@ -47,52 +47,35 @@ class PersonalQuotes(commands.Cog):
 
 	@commands.command(aliases = ['padd'])
 	async def personaladd(self, ctx, trigger, *, response = None):
-		db_response = c.execute("SELECT Trigger FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
-		if db_response:
-			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
-
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **You must include at least a response or an attachment in your message.**')
-
-		if response and ctx.message.attachments:
-			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-				conn.commit()
-			else:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-				conn.commit()
-		elif not response and ctx.message.attachments:
-			if len(ctx.message.attachments) == 1 and ctx.message.attachments[0].url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webp', '.bmp')):
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ctx.message.attachments[0].url.replace('\'', '\'\'') + "')")
-				conn.commit()
-			else:
-				c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + ' | '.join(['[' + attachment.filename.replace('\'', '\'\'') + '](' + attachment.url.replace('\'', '\'\'') + ')' for attachment in ctx.message.attachments]) + "')")
-				conn.commit()
 		else:
-			c.execute("INSERT INTO PersonalQuotes (User, Trigger, Response) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + response.replace('\'', '\'\'') + "')")
-			conn.commit()
+			try:
+				c.execute("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
+				conn.commit()
+			except sqlite3.IntegrityError:
+				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
 
 	@commands.command(aliases = ['qr'])
 	async def qradd(self, ctx, trigger, *, response = None):
-		db_response = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
-		if db_response:
-			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
-
 		if not response and not ctx.message.attachments:
 			return await ctx.send(content = error_string + ' **QR code must not be empty.**')
 
 		qr_url = 'https://chart.googleapis.com/chart?' + urllib.parse.urlencode({'cht': 'qr', 'chs': '200x200', 'chld': 'L|1', 'chl': response})
-		c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
-		conn.commit()
+		try:
+			c.execute("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
+			conn.commit()
+		except:
+			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
 
 	@commands.command(aliases = ['premove', 'prem'])
 	async def personalremove(self, ctx, *, trigger):
-		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id)).fetchall()
-		if trigger in [i[1] for i in user_quotes]:
+		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
+		if trigger:
 			c.execute("DELETE FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'")
 			conn.commit()
 			await ctx.send(content = success_string + ' **Quote deleted.**')
@@ -103,7 +86,7 @@ class PersonalQuotes(commands.Cog):
 	async def personal(self, ctx, *, trigger):
 		user_quote = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " AND Trigger = '" + trigger.replace('\'', '\'\'') + "'").fetchone()
 		if not user_quote:
-			await ctx.send(content = error_string + ' **No quote with that trigger exist.**')
+			await ctx.send(content = error_string + ' **Quote with that trigger does not exist.**')
 		else:
 			if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 				await ctx.message.delete()
@@ -114,9 +97,15 @@ class PersonalQuotes(commands.Cog):
 	async def personallist(self, ctx, page_number: int = 1):
 		user_quotes = c.execute("SELECT * FROM PersonalQuotes WHERE User = " + str(ctx.author.id) + " LIMIT 10 OFFSET " + str(10 * (page_number - 1))).fetchall()
 		if len(user_quotes) == 0:
-			await ctx.send(content = error_string + ' **No personal quotes on page ' + str(page_number) + '.**')
+			await ctx.send(content = error_string + ' **No personal quotes on page `' + str(page_number) + '`**')
 		else:
 			await ctx.send(embed = list_embed(user_quotes, ctx.author, page_number))
+
+	@commands.command(aliases = ['pclear'])
+	async def personalclear(self, ctx):
+		c.execute("DELETE FROM PersonalQuotes WHERE User = " + str(ctx.author.id))
+		conn.commit()
+		await ctx.send(content = success_string + ' **Cleared all your personal quotes.**')
 
 
 def setup(bot):

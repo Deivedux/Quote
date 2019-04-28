@@ -59,15 +59,7 @@ class Main(commands.Cog):
 		self.bot = bot
 
 	@commands.Cog.listener()
-	async def on_ready(self):
-		c.execute("DELETE FROM ServerConfig WHERE Guild NOT IN (" + ', '.join([str(guild.id) for guild in self.bot.guilds]) + ")")
-		conn.commit()
-
-	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
-		c.execute("DELETE FROM ServerConfig WHERE Guild = " + str(guild.id))
-		conn.commit()
-
 		try:
 			del prefixes[guild.id]
 		except KeyError:
@@ -82,6 +74,22 @@ class Main(commands.Cog):
 			on_reaction.remove(guild.id)
 		except ValueError:
 			pass
+
+	@commands.Cog.listener()
+	async def on_guild_join(self, guild):
+		try:
+			c.execute("INSERT INTO ServerConfig (Guild) VALUES (" + str(guild.id) + ")")
+			conn.commit()
+		except sqlite3.IntegrityError:
+			pass
+
+		db_response = c.execute("SELECT * FROM ServerConfig WHERE Guild = " + str(guild.id)).fetchone()
+		if db_response[1] != None:
+			prefixes[int(db_response[0])] = str(db_response[1])
+		if db_response[2] != None:
+			del_commands.append(int(db_response[0]))
+		if db_response[3] != None:
+			on_reaction.append(int(db_response[0]))
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
@@ -104,29 +112,39 @@ class Main(commands.Cog):
 						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
-	@commands.cooldown(1, 3, type = commands.BucketType.channel)
-	async def quote(self, ctx, msg_id: int = None, *, reply = None):
-		if not msg_id:
-			return await ctx.send(content = error_string + ' **Please specify a message ID to quote.**')
+	@commands.cooldown(2, 3, type = commands.BucketType.channel)
+	async def quote(self, ctx, msg_arg = None, *, reply = None):
+		if not msg_arg:
+			return await ctx.send(content = error_string + ' **Please provide a valid message argument.**')
 
 		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
 		message = None
 		try:
-			message = await ctx.channel.fetch_message(msg_id)
-		except:
-			for channel in ctx.guild.text_channels:
-				perms = ctx.guild.me.permissions_in(channel)
-				if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
-					continue
+			msg_arg = int(msg_arg)
+		except ValueError:
+			perms = ctx.guild.me.permissions_in(ctx.channel)
+			if perms.read_messages and perms.read_message_history:
+				async for msg in ctx.channel.history(limit = 100, before = ctx.message):
+					if msg_arg.lower() in msg.content.lower():
+						message = msg
+						break
+		else:
+			try:
+				message = await ctx.channel.fetch_message(msg_arg)
+			except:
+				for channel in ctx.guild.text_channels:
+					perms = ctx.guild.me.permissions_in(channel)
+					if channel == ctx.channel or not perms.read_messages or not perms.read_message_history:
+						continue
 
-				try:
-					message = await channel.fetch_message(msg_id)
-				except:
-					continue
-				else:
-					break
+					try:
+						message = await channel.fetch_message(msg_arg)
+					except:
+						continue
+					else:
+						break
 
 		if message:
 			if not message.content and message.embeds and message.author.bot:
@@ -240,12 +258,10 @@ class Main(commands.Cog):
 			webhook = await ctx.channel.create_webhook(name = 'Message Duplicator')
 
 			for msg in messages:
-				try:
-					async with aiohttp.ClientSession() as session:
-						webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
-						await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
-				except:
-					pass
+				async with aiohttp.ClientSession() as session:
+					webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
+					await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+				await asyncio.sleep(0.5)
 
 			await webhook.delete()
 

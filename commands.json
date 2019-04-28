@@ -11,12 +11,12 @@
 	},
 	"quote": {
 		"title": ["quote", "q"],
-		"description": "Quote a message using a message ID, and optionally leave your own reply to a quoted message.",
-		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply"]
+		"description": "Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message.",
+		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply", "quote message this is my reply", "quote \"this message\" my reply"]
 	},
 	"personaladd": {
 		"title": ["personaladd", "padd"],
-		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.",
+		"description": "Add your personal quote, with a trigger and a response, which only you can trigger in any server. A response can be any number of attachments and/or a follow-up message after the trigger.",
 		"examples": ["padd trigger response", "padd \"my trigger\" my response"]
 	},
 	"qradd": {
@@ -36,8 +36,13 @@
 	},
 	"personallist": {
 		"title": ["personallist", "plist"],
-		"description": "List your personal quotes.",
-		"examples": ["plist"]
+		"description": "List your personal quotes. 10 quotes per page.",
+		"examples": ["plist", "plist 2"]
+	},
+	"personalclear": {
+		"title": ["personalclear", "pclear"],
+		"description": "Deletes all your personal quotes.",
+		"examples": ["pclear"]
 	},
 	"prefix": {
 		"title": ["prefix"],
