@@ -49,7 +49,7 @@ class MessageURL(commands.Cog):
 				del list_ids[0]
 
 				try:
-					channel = self.bot.fetch_message(int(list_ids[0]))
+					channel = self.bot.get_channel(int(list_ids[0]))
 				except:
 					continue
 
