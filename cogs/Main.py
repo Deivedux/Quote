@@ -59,6 +59,23 @@ class Main(commands.Cog):
 		self.bot = bot
 
 	@commands.Cog.listener()
+	async def on_ready(self):
+		guild_ids = [guild.id for guild in self.bot.guilds]
+		prefix_guilds = [i for i in prefixes.keys()]
+
+		for i in prefix_guilds:
+			if i not in guild_ids:
+				del prefixes[i]
+
+		for i in del_commands:
+			if i not in guild_ids:
+				del_commands.remove(i)
+
+		for i in on_reaction:
+			if i not in guild_ids:
+				on_reaction.remove(i)
+
+	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
 		try:
 			del prefixes[guild.id]
