@@ -255,7 +255,11 @@ class Main(commands.Cog):
 	@commands.command(aliases = ['dupe'])
 	@commands.has_permissions(manage_guild = True)
 	async def duplicate(self, ctx, msgs: int, channel: discord.TextChannel):
-		if not ctx.guild.me.permissions_in(ctx.channel).manage_webhooks:
+		if not ctx.author.permissions_in(channel).read_messages or not ctx.author.permissions_in(channel).read_message_history:
+
+			return
+
+		elif not ctx.guild.me.permissions_in(ctx.channel).manage_webhooks:
 
 			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the current channel.**')
 

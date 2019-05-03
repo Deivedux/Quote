@@ -8,7 +8,6 @@ from discord.ext import commands
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
 
-embed_color = 0x399ad5
 categories = [
 	'Funny',
 	'Meme',
@@ -28,7 +27,7 @@ with open('configs/config.json') as json_data:
 	del response_json
 
 def quote_embed(category, quote):
-	return discord.Embed(title = category + ' Quote', description = quote, color = embed_color)
+	return discord.Embed(title = category + ' Quote', description = quote, color = 0x399ad5)
 
 def is_owner(ctx):
 	return ctx.author.id in owners
