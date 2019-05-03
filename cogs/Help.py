@@ -22,7 +22,7 @@ class Help(commands.Cog):
 	async def help(self, ctx, command = None):
 		try:
 			guild_prefix = prefixes[ctx.guild.id]
-		except KeyError:
+		except:
 			guild_prefix = default_prefix
 
 		with open('commands.json') as json_data:

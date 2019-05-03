@@ -55,7 +55,7 @@ class RandomQuotes(commands.Cog):
 			await ctx.send(content = success_string + ' **Quote submitted.**\n\nPlease note that there is a queue of quotes to be looked at, and they are all checked in order of which they were submitted at.', embed = quote_embed(category, quote))
 			async with aiohttp.ClientSession() as session:
 				webhook = discord.Webhook.from_url(webhook_url, adapter = discord.AsyncWebhookAdapter(session))
-				await webhook.send(content = ':speech_balloon: **Quote Submitted** by `' + str(ctx.author).strip('`') + '` (`' + str(ctx.author.id) + '`)')
+				await webhook.send(content = ':speech_balloon: **Quote Submitted** in **' + category + '** by `' + str(ctx.author).strip('`') + '` (`' + str(ctx.author.id) + '`)')
 		else:
 			await ctx.send(content = error_string + ' **Category with that name does not exist.**')
 
@@ -112,7 +112,7 @@ class RandomQuotes(commands.Cog):
 			user = self.bot.get_user(db_response[1])
 			if user:
 				try:
-					await user.send(content = error_string + ' **Your quote has been declined.**' + ('\n\n**Reason:** ' + reason if reason else ''), embed = quote_embed(db_response[2], db_response[3]))
+					await user.send(content = error_string + ' **Your quote has been declined.**' + ('\n\n**Reason:**\n' + reason if reason else ''), embed = quote_embed(db_response[2], db_response[3]))
 				except discord.Forbidden:
 					pass
 
