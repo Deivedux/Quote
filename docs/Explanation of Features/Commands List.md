@@ -6,7 +6,7 @@
 
 |Command|`>help`|
 |---|---|
-|Description|Show details on a specific command.|
+|Description|Show this message, or more details on a specific command.|
 |Example|`>help`|
 
 |Command|`>donators`|
@@ -19,30 +19,30 @@
 
 |Command|`>quote` / `>q`|
 |---|---|
-|Description|Quote a message using a message ID, and optionally leave your own reply to a quoted message.|
-|Example|`>quote 426100904874213387` or `>q 426100904874213387 This is my reply`|
-
-|Command|`>quotepart` / `>qp`|
-|---|---|
-|Description|Quote part of the message by specifying the exact words that message contains (case sensitive). Use quotation marks to quote multiple words from the message. Supported replying to messages from `>quote`.|
-|Example|`>qp "quote these words"`|
+|Description|Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message.|
+|Example|`>quote 426100904874213387` or `>q 426100904874213387 This is my reply` or `>quote message this is my reply` or `>quote "this message" my reply`|
 
 |Command|`>snipe`|
 |---|---|
 |Description|Snipe the last deleted message from the specified channel. Defaults to current channel.|
 |Example|`>snipe` or `>snipe #general`|
 
+|Command|`>duplicate` / `>dupe`|
+|---|---|
+|Description|Duplicate messages from the provided channel to the current with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from. User requires `Manage Server` permission to execute.|
+|Example|`>dupe 20 #chat`|
+
 
 ## Server
 
 |Command|`>prefix`|
 |---|---|
-|Description|See the current prefix, or change prefix for this server.|
+|Description|See currently set prefix, or change to a different prefix for this server.|
 |Example|`>prefix` or `>prefix !`|
 
 |Command|`>delcommands` / `>delcmds`|
 |---|---|
-|Description|Toggle whether to automatically command messages.|
+|Description|Toggle whether to automatically delete the quote command message before quoting.|
 |Example|`>delcommands`|
 
 |Command|`>reactions`|
@@ -61,7 +61,7 @@
 
 |Command|`>personaladd` / `>padd`|
 |---|---|
-|Description|Add your personal quote, with a trigger and a response, which only you can trigger in any server. A maximum of 10 personal quotes are allowed.|
+|Description|Add your personal quote, with a trigger and a response, which only you can trigger in any server. A response can be any number of attachments and/or a follow-up message after the trigger.|
 |Example|`>padd trigger response` or `>padd "my trigger" my response`|
 
 |Command|`>qradd` / `>qr`|
@@ -81,11 +81,49 @@
 
 |Command|`>personallist` / `>plist`|
 |---|---|
-|Description|List your personal quotes.|
+|Description|List your personal quotes. 10 quotes per page.|
 |Example|`>plist`|
+
+|Commands|`>personalclear` / `>pclear`|
+|---|---|
+|Description|Deletes all your personal quotes.|
+|Example|`>pclear`|
+
+
+## Random Quotes
+
+|Command|`>randquote`|
+|---|---|
+|Description|Shows a random quote from a random (or specified) category. Type `{0}randcategories` for a list of categories.|
+|Example|`>randquote` or `>randquote Funny`|
+
+|Command|`>randcategories`|
+|---|---|
+|Description|Shows a list of available quote categories.|
+|Example|`>randcategories`|
+
+|Command|`>randsubmit`|
+|---|---|
+|Description|Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 2 uses within an hour per user, regardless of it's success.|
+|Example|`>randsubmit Meme This is a meme quote.`|
 
 
 ## Owner
+
+|Command|`>randqueue`|
+|---|---|
+|Description|Show the next unapproved random quote from the queue.|
+|Example|`>randqueue`|
+
+|Command|`>randapprove`|
+|---|---|
+|Description|Approve a random quote by it's ID.|
+|Example|`>randapprove 225`|
+
+|Command|`>randdecline`|
+|---|---|
+|Description|Decline a random quote by it's ID with an optional reason.|
+|Example|`>randdecline 225 bad quote`|
 
 |Command|`>blacklistadd`|
 |---|---|
