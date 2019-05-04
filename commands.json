@@ -44,6 +44,21 @@
 		"description": "Deletes all your personal quotes.",
 		"examples": ["pclear"]
 	},
+	"randquote": {
+		"title": ["randquote"],
+		"description": "Shows a random quote from a random (or specified) category. Type `{0}randcategories` for a list of categories.",
+		"examples": ["randquote", "randquote Funny"]
+	},
+	"randcategories": {
+		"title": ["randcategories"],
+		"description": "Shows a list of available quote categories.",
+		"examples": ["randcategories"]
+	},
+	"randsubmit": {
+		"title": ["randsubmit"],
+		"description": "Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 2 uses within an hour per user, regardless of it's success.",
+		"examples": ["randsubmit Meme This is a meme quote."]
+	},
 	"prefix": {
 		"title": ["prefix"],
 		"description": "See currently set prefix, or change to a different prefix for this server.",

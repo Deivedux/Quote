@@ -60,7 +60,7 @@ class MessageURL(commands.Cog):
 						continue
 
 					try:
-						msg_found = await channel.get_message(msg_id)
+						msg_found = await channel.fetch_message(msg_id)
 					except:
 						continue
 					else:

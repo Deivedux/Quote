@@ -7,11 +7,11 @@ from discord.ext import commands
 
 conn = sqlite3.connect('configs/QuoteBot.db')
 c = conn.cursor()
-# Create necessary database tables, if they don't exist already, on it's own behalf.
 c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
 c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT, PRIMARY KEY (User, Trigger))")
 c.execute("CREATE TABLE IF NOT EXISTS Donators (UserId INTEGER unique, UserTag TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS RandomQuotes (QuoteID INTEGER PRIMARY KEY, Author INTEGER, Category TEXT, Quote TEXT, Approved INTEGER)")
 
 from cogs.Main import prefixes
 
@@ -34,7 +34,7 @@ bot = commands.AutoShardedBot(command_prefix = get_prefix, case_insensitive = Tr
 bot.remove_command('help')
 # A custom command is defined in Help.py
 
-startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe', 'cogs.PersonalQuotes', 'cogs.MessageURL']
+startup_extensions = ['cogs.Main', 'cogs.Help', 'cogs.OwnerOnly', 'cogs.Pin', 'cogs.Snipe', 'cogs.PersonalQuotes', 'cogs.MessageURL', 'cogs.RandomQuotes']
 for cog in startup_extensions:
 	try:
 		bot.load_extension(cog)

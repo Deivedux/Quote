@@ -11,7 +11,6 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 ## Quoting 
 
-
 * You can quote messages by reacting with 💬 (`:speech_balloon:`) to them (this feature needs to be enabled first by using the `>reactions` command).
 
 
@@ -27,8 +26,6 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
   * ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
   
-  
-  
 
 * **You can now quote by directly sending a link to a message**, Quote will automatically embed the linked message.
 
@@ -39,14 +36,10 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
   * ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
   
   
-
-
 * The footer contains useful information on the requester, channel of the original message and timestamp of the original message.
 
 
-
 * The Original Poster name in the quote is actually a clickable link to the original message.
-
 
 
 * The bot supports quoting of regular messages sent either by users or other bots, but also supports quoting messages containing single or multiple files attachments.
@@ -54,15 +47,16 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
   * If the original message has a single image as an attachment Quote will automatically embed it.
 
 
-
 ## Delete Commands
-* You can set the bot to automatically delete the commands used to quote messages. Type `>delcommands`to activate the option server wide.
+* You can set the bot to automatically delete the commands used to quote messages. Type `>delcommands` to activate the option server wide.
 
+
+## Random Quotes
+* Get a random quote from a random (or specified) category. You can also submit your own quotes for someone else to randomize in the future.
 
 
 ## Pinning
 * You can define a pin channel by running the command `>pinchannel #myChannel`, and have the bot embed there any message to which you add a 📌 (`:pushpin:`) reaction to. (Only users with Manage Messages permission can use this to avoid spam.)
-
 
 
 ## Snipe
@@ -71,27 +65,22 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
   * Add a channel identifier `>snipe #myChannel` to see last deleted message in #myChannel.
 
 
-
 ## Custom Prefix
 * Don't like `>` as your server's prefix? You can change it by using `>prefix <your custom prefix>` eg: `>prefix !`.
-
 
 
 ## Help
 * The bot comes with a `>help` function that shows the list of all available commands. 
 * You can type `>help <exampleCommand>` to see more information about each command. 
 
-##  Anti-Bot Farm
+
+## Anti-Bot Farm
 * Quote will leave any server with more than 20 members that has more than 70% of the population composed of Bots.
 
 
-
-## Self-Host
+# Self-Host
 * If you'd like to selfhost Quote, you are more than welcome to by following one of the guides found on our [**Documentation Page**](https://quote.readthedocs.io/en/latest/).
 
 
-
-## Suggestions
+# Suggestions
 * Have a suggestion? Join our [**Support Server**](https://discord.gg/sbySHxA) and head over to #suggestions. Follow the template to submit your own suggestion.
-
-

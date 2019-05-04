@@ -61,7 +61,7 @@ class Pin(commands.Cog):
 				return
 
 			try:
-				message = await pin_channel.get_message(payload.message_id)
+				message = await pin_channel.fetch_message(payload.message_id)
 			except discord.Forbidden:
 				return
 			else:
