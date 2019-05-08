@@ -1,26 +1,20 @@
 import discord
-import datetime
 import asyncio
-import sqlite3
 import json
 import aiohttp
+from DBService import DBService
 from discord.ext import commands
 from cogs.OwnerOnly import blacklist_ids
 
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
+server_config_raw = DBService.exec("SELECT * FROM ServerConfig").fetchall()
+server_config = dict()
 
-server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
-prefixes = {}
-del_commands = []
-on_reaction = []
+def cache_guild(db_response):
+	server_config[db_response[0]] = {'prefix': db_response[1], 'del_commands': True if db_response[2] else False, 'on_reaction': True if db_response[3] else False}
+
 for i in server_config_raw:
-	if i[1] != None:
-		prefixes[int(i[0])] = str(i[1])
-	if i[2] != None:
-		del_commands.append(int(i[0]))
-	if i[3] != None:
-		on_reaction.append(int(i[0]))
+	cache_guild(i)
+
 del server_config_raw
 
 with open('configs/config.json') as json_data:
@@ -61,56 +55,37 @@ class Main(commands.Cog):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		guild_ids = [guild.id for guild in self.bot.guilds]
-		prefix_guilds = [i for i in prefixes.keys()]
+		cached_guilds = [i for i in server_config.keys()]
 
-		for i in prefix_guilds:
+		for i in cached_guilds:
 			if i not in guild_ids:
-				del prefixes[i]
-
-		for i in del_commands:
-			if i not in guild_ids:
-				del_commands.remove(i)
-
-		for i in on_reaction:
-			if i not in guild_ids:
-				on_reaction.remove(i)
+				del cached_guilds[i]
 
 	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
 		try:
-			del prefixes[guild.id]
+			del server_config[guild.id]
 		except KeyError:
-			pass
-
-		try:
-			del_commands.remove(guild.id)
-		except ValueError:
-			pass
-
-		try:
-			on_reaction.remove(guild.id)
-		except ValueError:
 			pass
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
 		try:
-			c.execute("INSERT INTO ServerConfig (Guild) VALUES (" + str(guild.id) + ")")
-			conn.commit()
-		except sqlite3.IntegrityError:
+			DBService.exec("INSERT INTO ServerConfig (Guild) VALUES (" + str(guild.id) + ")")
+		except Exception:
 			pass
 
-		db_response = c.execute("SELECT * FROM ServerConfig WHERE Guild = " + str(guild.id)).fetchone()
-		if db_response[1] != None:
-			prefixes[int(db_response[0])] = str(db_response[1])
-		if db_response[2] != None:
-			del_commands.append(int(db_response[0]))
-		if db_response[3] != None:
-			on_reaction.append(int(db_response[0]))
+		db_response = DBService.exec("SELECT * FROM ServerConfig WHERE Guild = " + str(guild.id)).fetchone()
+		cache_guild(db_response)
+
+	@commands.Cog.listener()
+	async def on_command_error(self, ctx, error):
+		if isinstance(error, commands.CommandOnCooldown):
+			await ctx.send(content = error_string + ' **Please wait ' + str(round(error.retry_after, 1)) + ' seconds before invoking this again.**', delete_after = 5)
 
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
-		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and payload.guild_id in on_reaction:
+		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and server_config[payload.guild_id]['on_reaction']:
 			guild = self.bot.get_guild(payload.guild_id)
 			channel = guild.get_channel(payload.channel_id)
 			user = guild.get_member(payload.user_id)
@@ -129,12 +104,12 @@ class Main(commands.Cog):
 						await channel.send(embed = quote_embed(channel, message, user))
 
 	@commands.command(aliases = ['q'])
-	@commands.cooldown(2, 3, type = commands.BucketType.channel)
+	@commands.cooldown(rate = 2, per = 5, type = commands.BucketType.channel)
 	async def quote(self, ctx, msg_arg = None, *, reply = None):
 		if not msg_arg:
 			return await ctx.send(content = error_string + ' **Please provide a valid message argument.**')
 
-		if ctx.guild and ctx.guild.id in del_commands and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
+		if ctx.guild and server_config[ctx.guild.id]['del_commands'] and ctx.guild.me.permissions_in(ctx.channel).manage_messages:
 			await ctx.message.delete()
 
 		message = None
@@ -180,11 +155,7 @@ class Main(commands.Cog):
 
 		if not prefix:
 
-			try:
-				guild_prefix = prefixes[ctx.guild.id]
-			except KeyError:
-				guild_prefix = default_prefix
-
+			guild_prefix = server_config[ctx.guild.id]['prefix'] if server_config[ctx.guild.id]['prefix'] is not None else default_prefix
 			await ctx.send(content = '**My prefix here is** `' + guild_prefix + '`')
 
 		else:
@@ -196,76 +167,71 @@ class Main(commands.Cog):
 				return await ctx.send(content = error_string + ' **Invalid prefix format. Make sure of the following:\n• Prefix is not over 5 characters long.\n• Prefix does not contain new lines.**')
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
-			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
-			prefixes[ctx.guild.id] = prefix
+				DBService.exec("INSERT INTO ServerConfig (Guild, Prefix) VALUES (" + str(ctx.guild.id) + ", '" + str(prefix).replace('\'', '\'\'') + "')")
+			except Exception:
+				DBService.exec("UPDATE ServerConfig SET Prefix = '" + str(prefix).replace('\'', '\'\'') + "' WHERE Guild = " + str(ctx.guild.id))
+			server_config[ctx.guild.id]['prefix'] = prefix
 
 			await ctx.send(content = success_string + ' **Prefix changed to** `' + prefix + '`')
 
 	@commands.command(aliases = ['delcmds'])
+	@commands.has_permissions(manage_guild = True)
 	async def delcommands(self, ctx):
-		if not ctx.guild or not ctx.author.guild_permissions.manage_guild:
-			return
-
-		if ctx.guild.id not in del_commands:
+		if not server_config[ctx.guild.id]['del_commands']:
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, DelCommands) VALUES (" + str(ctx.guild.id) + ", '1')")
-			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET DelCommands = '1' WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
-			del_commands.append(ctx.guild.id)
+				DBService.exec("INSERT INTO ServerConfig (Guild, DelCommands) VALUES (" + str(ctx.guild.id) + ", '1')")
+			except Exception:
+				DBService.exec("UPDATE ServerConfig SET DelCommands = '1' WHERE Guild = " + str(ctx.guild.id))
+			server_config[ctx.guild.id]['del_commands'] = True
 
 			await ctx.send(content = success_string + ' **Auto-delete of quote commands enabled.**')
 
 		else:
 
-			c.execute("UPDATE ServerConfig SET DelCommands = NULL WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
-			del_commands.remove(ctx.guild.id)
+			DBService.exec("UPDATE ServerConfig SET DelCommands = NULL WHERE Guild = " + str(ctx.guild.id))
+			server_config[ctx.guild.id]['del_commands'] = False
 
 			await ctx.send(content = success_string + ' **Auto-delete of quote commands disabled.**')
 
 	@commands.command()
+	@commands.has_permissions(manage_guild = True)
 	async def reactions(self, ctx):
-		if not ctx.guild or not ctx.author.guild_permissions.manage_guild:
-			return
-
-		if ctx.guild.id not in on_reaction:
+		if not server_config[ctx.guild.id]['on_reaction']:
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, OnReaction) VALUES (" + str(ctx.guild.id) + ", '1')")
-			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET OnReaction = '1' WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
-			on_reaction.append(ctx.guild.id)
+				DBService.exec("INSERT INTO ServerConfig (Guild, OnReaction) VALUES (" + str(ctx.guild.id) + ", '1')")
+			except Exception:
+				DBService.exec("UPDATE ServerConfig SET OnReaction = '1' WHERE Guild = " + str(ctx.guild.id))
+			server_config[ctx.guild.id]['on_reaction'] = True
 
 			await ctx.send(content = success_string + ' **Quoting messages on reaction enabled.**')
 
 		else:
 
-			c.execute("UPDATE ServerConfig SET OnReaction = NULL WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
-			on_reaction.remove(ctx.guild.id)
+			DBService.exec("UPDATE ServerConfig SET OnReaction = NULL WHERE Guild = " + str(ctx.guild.id))
+			server_config[ctx.guild.id]['on_reaction'] = False
 
 			await ctx.send(content = success_string + ' **Quoting messages on reaction disabled.**')
 
 	@commands.command(aliases = ['dupe'])
 	@commands.has_permissions(manage_guild = True)
-	async def duplicate(self, ctx, msgs: int, channel: discord.TextChannel):
-		if not ctx.author.permissions_in(channel).read_messages or not ctx.author.permissions_in(channel).read_message_history:
+	@commands.cooldown(rate = 2, per = 30, type = commands.BucketType.guild)
+	async def duplicate(self, ctx, msgs: int, from_channel: discord.TextChannel, to_channel: discord.TextChannel = None):
+		if not to_channel:
+			to_channel = ctx.channel
+
+		if not ctx.author.permissions_in(from_channel).read_messages or not ctx.author.permissions_in(from_channel).read_message_history:
 
 			return
 
 		elif not ctx.guild.me.permissions_in(ctx.channel).manage_webhooks:
 
-			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the current channel.**')
+			await ctx.send(content = error_string + ' **Duplicating messages require me to have `Manage Webhooks` permission in the target channel.**')
 
-		elif not ctx.guild.me.permissions_in(channel).read_messages or not ctx.guild.me.permissions_in(channel).read_message_history:
+		elif not ctx.guild.me.permissions_in(from_channel).read_messages or not ctx.guild.me.permissions_in(from_channel).read_message_history:
 
-			await ctx.send(content = error_string + ' **I do not have permissions to fetch messages in ' + channel.mention + '.**')
+			await ctx.send(content = error_string + ' **I do not have enough permissions to fetch messages from** ' + from_channel.mention)
 
 		else:
 
@@ -273,16 +239,19 @@ class Main(commands.Cog):
 				msgs = 100
 
 			messages = list()
-			async for msg in channel.history(limit = msgs, before = ctx.message, reverse = True):
+			async for msg in from_channel.history(limit = msgs, before = ctx.message):
 				messages.append(msg)
 
 			webhook = await ctx.channel.create_webhook(name = 'Message Duplicator')
 
-			for msg in messages:
+			for msg in reversed(messages):
+				await asyncio.sleep(0.5)
 				async with aiohttp.ClientSession() as session:
 					webhook_channel = discord.Webhook.from_url(webhook.url, adapter = discord.AsyncWebhookAdapter(session))
-					await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
-				await asyncio.sleep(0.5)
+					try:
+						await webhook_channel.send(username = msg.author.display_name, avatar_url = msg.author.avatar_url, content = msg.content, embeds = msg.embeds, wait = True)
+					except:
+						continue
 
 			await webhook.delete()
 

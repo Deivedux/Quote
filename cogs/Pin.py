@@ -1,13 +1,11 @@
 import discord
 import sqlite3
 import json
+from DBService import DBService
 from discord.ext import commands
 from cogs.OwnerOnly import blacklist_ids
 
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
-
-server_config_raw = c.execute("SELECT * FROM ServerConfig").fetchall()
+server_config_raw = DBService.exec("SELECT * FROM ServerConfig").fetchall()
 pin_channels = {}
 for i in server_config_raw:
 	if i[4] != None:
@@ -50,8 +48,7 @@ class Pin(commands.Cog):
 				return
 			else:
 				if not channel:
-					c.execute("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(payload.guild_id))
-					conn.commit()
+					DBService.exec("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(payload.guild_id))
 					del pin_channels[payload.guild_id]
 					return
 
@@ -83,19 +80,16 @@ class Pin(commands.Cog):
 				return await ctx.send(content = error_string + ' **Make sure I have all of the following permissions in that channel before enabling pins:\n• Read Messages\n• Read Message History\n• Send Messages\n• Embed Links**')
 
 			try:
-				c.execute("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", " + str(channel.id) + ")")
-				conn.commit()
+				DBService.exec("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", " + str(channel.id) + ")")
 			except sqlite3.IntegrityError:
-				c.execute("UPDATE ServerConfig SET PinChannel = " + str(channel.id) + " WHERE Guild = " + str(ctx.guild.id))
-				conn.commit()
+				DBService.exec("UPDATE ServerConfig SET PinChannel = " + str(channel.id) + " WHERE Guild = " + str(ctx.guild.id))
 			pin_channels[ctx.guild.id] = channel.id
 
 			await ctx.send(content = success_string + ' **Pin channel set to** ' + channel.mention)
 
 		else:
 
-			c.execute("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(ctx.guild.id))
-			conn.commit()
+			DBService.exec("UPDATE ServerConfig SET PinChannel = NULL WHERE Guild = " + str(ctx.guild.id))
 			del pin_channels[ctx.guild.id]
 
 			await ctx.send(content = success_string + ' **Pin channel disabled.**')

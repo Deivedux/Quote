@@ -11,7 +11,7 @@
 	},
 	"quote": {
 		"title": ["quote", "q"],
-		"description": "Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message.",
+		"description": "Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message. Limited to 2 uses per 5 second time frame per channel.",
 		"examples": ["quote 426100904874213387", "q 426100904874213387 This is my reply", "quote message this is my reply", "quote \"this message\" my reply"]
 	},
 	"personaladd": {
@@ -56,7 +56,7 @@
 	},
 	"randsubmit": {
 		"title": ["randsubmit"],
-		"description": "Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 2 uses within an hour per user, regardless of it's success.",
+		"description": "Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 5 uses within an hour per user, regardless of it's success. Limited to 5 uses per 60 minute time frame per user.",
 		"examples": ["randsubmit Meme This is a meme quote."]
 	},
 	"prefix": {
@@ -76,8 +76,8 @@
 	},
 	"duplicate": {
 		"title": ["duplicate", "dupe"],
-		"description": "Duplicate messages from the provided channel to the current with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from. User requires `Manage Server` permission to execute.",
-		"examples": ["dupe 20 #chat"]
+		"description": "Duplicate messages from one channel to the other with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from, third argument is the target channels to duplicate messages to (defaults to current). User requires `Manage Server` permission to execute. Limited to 2 uses per 30 second time frame per server.",
+		"examples": ["dupe 20 #from #to", "dupe 20 #chat"]
 	},
 	"pinchannel": {
 		"title": ["pinchannel", "pinc"],
@@ -86,7 +86,7 @@
 	},
 	"snipe": {
 		"title": ["snipe"],
-		"description": "Snipe the last deleted message from a specified channel. Defaults to the current channel.",
+		"description": "Snipe the last deleted message from a specified channel. Defaults to current channel.",
 		"examples": ["snipe", "snipe #general"]
 	}
 }
