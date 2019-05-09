@@ -81,7 +81,7 @@ class Pin(commands.Cog):
 
 			try:
 				DBService.exec("INSERT INTO ServerConfig (Guild, PinChannel) VALUES (" + str(ctx.guild.id) + ", " + str(channel.id) + ")")
-			except sqlite3.IntegrityError:
+			except Exception:
 				DBService.exec("UPDATE ServerConfig SET PinChannel = " + str(channel.id) + " WHERE Guild = " + str(ctx.guild.id))
 			pin_channels[ctx.guild.id] = channel.id
 

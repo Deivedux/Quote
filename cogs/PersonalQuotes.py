@@ -49,7 +49,7 @@ class PersonalQuotes(commands.Cog):
 		else:
 			try:
 				DBService.exec("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
-			except sqlite3.IntegrityError:
+			except Exception:
 				return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
@@ -62,7 +62,7 @@ class PersonalQuotes(commands.Cog):
 		qr_url = 'https://chart.googleapis.com/chart?' + urllib.parse.urlencode({'cht': 'qr', 'chs': '200x200', 'chld': 'L|1', 'chl': response})
 		try:
 			DBService.exec("INSERT INTO PersonalQuotes (User, Trigger, Attachments) VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "', '" + qr_url.replace('\'', '\'\'') + "')")
-		except:
+		except Exception:
 			return await ctx.send(content = error_string + ' **You already have a quote with that trigger.**')
 
 		await ctx.send(content = success_string + ' **Quote added.**')
