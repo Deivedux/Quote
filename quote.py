@@ -14,7 +14,10 @@ token = response_json['token']
 async def get_prefix(bot, message):
 	if message.guild:
 		try:
-			return commands.when_mentioned_or(server_config['prefix'][message.guild.id])(bot, message)
+			if server_config[message.guild.id]['prefix']:
+				return commands.when_mentioned_or(server_config[message.guild.id]['prefix'])(bot, message)
+			else:
+				return commands.when_mentioned_or(default_prefix)(bot, message)
 		except KeyError:
 			return commands.when_mentioned_or(default_prefix)(bot, message)
 	else:

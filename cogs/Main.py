@@ -54,6 +54,16 @@ class Main(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_ready(self):
+		for guild in self.bot.guilds:
+			try:
+				DBService.exec("INSERT INTO ServerConfig (Guild) VALUES (" + str(guild.id) + ")")
+			except Exception:
+				continue
+
+		server_config_raw = DBService.exec("SELECT * FROM ServerConfig").fetchall()
+		for i in server_config_raw:
+			cache_guild(i)
+
 		guild_ids = [guild.id for guild in self.bot.guilds]
 		cached_guilds = [i for i in server_config.keys()]
 
@@ -78,11 +88,11 @@ class Main(commands.Cog):
 		db_response = DBService.exec("SELECT * FROM ServerConfig WHERE Guild = " + str(guild.id)).fetchone()
 		cache_guild(db_response)
 
-	@commands.Cog.listener()
+	'''@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, commands.CommandOnCooldown):
 			await ctx.send(content = error_string + ' **Please wait ' + str(round(error.retry_after, 1)) + ' seconds before invoking this again.**', delete_after = 5)
-
+'''
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
 		if str(payload.emoji) == '💬' and payload.user_id not in blacklist_ids and not self.bot.get_guild(payload.guild_id).get_member(payload.user_id).bot and server_config[payload.guild_id]['on_reaction']:

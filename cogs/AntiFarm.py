@@ -36,12 +36,12 @@ class AntiFarm(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		if farm_check(guild):
+		if farm_check(member.guild):
 			await member.guild.leave()
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
-		if farm_check(guild):
+		if farm_check(member.guild):
 			await member.guild.leave()
 
 
