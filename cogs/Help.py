@@ -1,12 +1,9 @@
 import discord
 import json
-import sqlite3
+from DBService import DBService
 from discord.ext import commands
-from cogs.Main import prefixes
+from cogs.Main import server_config
 from collections import OrderedDict
-
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -20,10 +17,7 @@ class Help(commands.Cog):
 
 	@commands.command()
 	async def help(self, ctx, command = None):
-		try:
-			guild_prefix = prefixes[ctx.guild.id]
-		except:
-			guild_prefix = default_prefix
+		guild_prefix = server_config[ctx.guild.id]['prefix'] if server_config[ctx.guild.id]['prefix'] is not None else default_prefix
 
 		with open('commands.json') as json_data:
 			commands_json = json.load(json_data, object_pairs_hook = OrderedDict)
@@ -49,7 +43,7 @@ class Help(commands.Cog):
 
 	@commands.command()
 	async def donators(self, ctx):
-		patrons = [i[0] for i in c.execute("SELECT UserTag FROM Donators").fetchall()]
+		patrons = [i[0] for i in DBService.exec("SELECT UserTag FROM Donators").fetchall()]
 		await ctx.send(embed = discord.Embed(title = 'Quote Donators', description = ', '.join(['`' + i + '`' for i in patrons]), color = 0x08FF00))
 
 

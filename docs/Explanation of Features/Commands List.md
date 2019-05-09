@@ -19,7 +19,7 @@
 
 |Command|`>quote` / `>q`|
 |---|---|
-|Description|Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message.|
+|Description|Quote a message using a message ID or by saying a part of the message (case-insensitive), and optionally leave your own reply to a quoted message. Limited to 2 uses per 5 second time frame per channel.|
 |Example|`>quote 426100904874213387` or `>q 426100904874213387 This is my reply` or `>quote message this is my reply` or `>quote "this message" my reply`|
 
 |Command|`>snipe`|
@@ -29,8 +29,8 @@
 
 |Command|`>duplicate` / `>dupe`|
 |---|---|
-|Description|Duplicate messages from the provided channel to the current with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from. User requires `Manage Server` permission to execute.|
-|Example|`>dupe 20 #chat`|
+|Description|Duplicate messages from one channel to the other with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from, third argument is the target channels to duplicate messages to (defaults to current). User requires `Manage Server` permission to execute. Limited to 2 uses per 30 second time frame per server.|
+|Example|`dupe 20 #from #to` or `>dupe 20 #chat`|
 
 
 ## Server
@@ -104,8 +104,21 @@
 
 |Command|`>randsubmit`|
 |---|---|
-|Description|Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 2 uses within an hour per user, regardless of it's success.|
+|Description|Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 5 uses within an hour per user, regardless of it's success. Limited to 5 uses per 60 minute time frame per user.|
 |Example|`>randsubmit Meme This is a meme quote.`|
+
+
+## Other
+
+|Command|`>lookup`|
+|---|---|
+|Description|Look up general information about a Discord invite URL/code.|
+|Example|`>lookup sbySHxA`|
+
+|Command|`>snowflake`|
+|---|---|
+|Description|Gets the creation date and time of the specified Discord snowflake (ID).|
+|Example|`>snowflake 418455732741079040`|
 
 
 ## Owner

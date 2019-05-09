@@ -1,15 +1,10 @@
 import discord
 import json
-import sqlite3
-from io import StringIO
+from DBService import DBService
 from discord.ext import commands
 
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
-
-blacklist_raw = c.execute("SELECT Id FROM Blacklist").fetchall()
-blacklist_ids = [int(i[0]) for i in blacklist_raw]
-del blacklist_raw
+blacklist_ids = DBService.exec("SELECT Id FROM Blacklist").fetchall()
+blacklist_ids = [int(i[0]) for i in blacklist_ids]
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -28,7 +23,7 @@ class Owneronly(commands.Cog):
 	@commands.command()
 	@commands.check(is_owner)
 	async def donator(self, ctx, user_id: int):
-		patrons = [int(i[0]) for i in c.execute("SELECT UserId FROM Donators").fetchall()]
+		patrons = [int(i[0]) for i in DBService.exec("SELECT UserId FROM Donators").fetchall()]
 		if user_id not in patrons:
 			user = self.bot.get_user(user_id)
 			if not user:
@@ -37,14 +32,10 @@ class Owneronly(commands.Cog):
 				except discord.NotFound:
 					return await ctx.send(content = error_string + ' **That user does not exist.**')
 
-			c.execute("INSERT INTO Donators (UserId, UserTag) VALUES (" + str(user_id) + ", '" + str(user) + "')")
-			conn.commit()
-
+			DBService.exec("INSERT INTO Donators (UserId, UserTag) VALUES (" + str(user_id) + ", '" + str(user) + "')")
 			await ctx.send(content = success_string + ' **Added `' + str(user) + '` to the donators list.**')
 		else:
-			c.execute("DELETE FROM Donators WHERE UserId = " + str(user_id))
-			conn.commit()
-
+			DBService.exec("DELETE FROM Donators WHERE UserId = " + str(user_id))
 			user = self.bot.get_user(user_id)
 			if not user:
 				user = await self.bot.get_user_info(user_id)
@@ -56,11 +47,9 @@ class Owneronly(commands.Cog):
 	async def blacklistadd(self, ctx, object_id: int, *, reason = None):
 		try:
 			if reason:
-				c.execute("INSERT INTO Blacklist (Id, Reason) VALUES (" + str(object_id) + ", '" + reason.replace('\'', '\'\'') + "')")
-				conn.commit()
+				DBService.exec("INSERT INTO Blacklist (Id, Reason) VALUES (" + str(object_id) + ", '" + reason.replace('\'', '\'\'') + "')")
 			else:
-				c.execute("INSERT INTO Blacklist (Id) VALUES (" + str(object_id) + ")")
-				conn.commit()
+				DBService.exec("INSERT INTO Blacklist (Id) VALUES (" + str(object_id) + ")")
 		except sqlite3.IntegrityError:
 			await ctx.send(content = error_string + ' **That ID is already blacklisted.**')
 		else:
@@ -73,7 +62,7 @@ class Owneronly(commands.Cog):
 	@commands.command()
 	@commands.check(is_owner)
 	async def blacklistcheck(self, ctx, object_id: int):
-		blacklist_raw = c.execute("SELECT * FROM Blacklist WHERE Id = " + str(object_id)).fetchone()
+		blacklist_raw = DBService.exec("SELECT * FROM Blacklist WHERE Id = " + str(object_id)).fetchone()
 		if not blacklist_raw:
 			await ctx.send(content = error_string + ' **That ID is not blacklisted.**')
 		else:
@@ -87,8 +76,7 @@ class Owneronly(commands.Cog):
 		except ValueError:
 			await ctx.send(content = error_string + ' **That ID is not blacklisted.**')
 		else:
-			c.execute("DELETE FROM Blacklist WHERE Id = " + str(object_id))
-			conn.commit()
+			DBService.exec("DELETE FROM Blacklist WHERE Id = " + str(object_id))
 			await ctx.send(content = success_string + ' **Successfully unblacklisted:** `' + str(object_id) + '`')
 
 	@commands.command()
@@ -105,6 +93,7 @@ class Owneronly(commands.Cog):
 	@commands.check(is_owner)
 	async def shutdown(self, ctx):
 		await ctx.send(content = success_string + ' **Shutting down.**')
+		DBService.commit()
 		await self.bot.logout()
 
 

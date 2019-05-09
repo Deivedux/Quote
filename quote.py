@@ -1,19 +1,9 @@
 import discord
 import asyncio
-import sqlite3
 import json
-from io import StringIO
+import DBService
 from discord.ext import commands
-
-conn = sqlite3.connect('configs/QuoteBot.db')
-c = conn.cursor()
-c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix TEXT, DelCommands TEXT, OnReaction TEXT, PinChannel INTEGER)")
-c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT, PRIMARY KEY (User, Trigger))")
-c.execute("CREATE TABLE IF NOT EXISTS Donators (UserId INTEGER unique, UserTag TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS RandomQuotes (QuoteID INTEGER PRIMARY KEY, Author INTEGER, Category TEXT, Quote TEXT, Approved INTEGER)")
-
-from cogs.Main import prefixes
+from cogs.Main import server_config
 
 with open('configs/config.json') as json_data:
 	response_json = json.load(json_data)
@@ -24,7 +14,7 @@ token = response_json['token']
 async def get_prefix(bot, message):
 	if message.guild:
 		try:
-			return commands.when_mentioned_or(prefixes[message.guild.id])(bot, message)
+			return commands.when_mentioned_or(server_config['prefix'][message.guild.id])(bot, message)
 		except KeyError:
 			return commands.when_mentioned_or(default_prefix)(bot, message)
 	else:

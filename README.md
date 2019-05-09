@@ -78,6 +78,10 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 * Quote will leave any server with more than 20 members that has more than 70% of the population composed of Bots.
 
 
+## Other
+* All of ther useful features that you'll love. We're still improving, so give us a chance.
+
+
 # Self-Host
 * If you'd like to selfhost Quote, you are more than welcome to by following one of the guides found on our [**Documentation Page**](https://quote.readthedocs.io/en/latest/).
 
