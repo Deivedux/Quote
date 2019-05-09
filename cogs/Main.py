@@ -2,6 +2,7 @@ import discord
 import asyncio
 import json
 import aiohttp
+import datetime
 from DBService import DBService
 from discord.ext import commands
 from cogs.OwnerOnly import blacklist_ids
@@ -45,7 +46,6 @@ def quote_embed(context_channel, message, user):
 			embed.set_footer(text = 'Quoted by: ' + str(user) + ' | in channel: #' + message.channel.name)
 		else:
 			embed.set_footer(text = 'Quoted by: ' + str(user))
-
 	return embed
 
 class Main(commands.Cog):
@@ -254,6 +254,42 @@ class Main(commands.Cog):
 						continue
 
 			await webhook.delete()
+
+	@commands.command()
+	@commands.cooldown(rate = 2, per = 5, type = commands.BucketType.user)
+	async def lookup(self, ctx, arg):
+		try:
+			invite = await self.bot.fetch_invite(arg, with_counts = True)
+		except discord.NotFound:
+			await ctx.send(content = error_string + ' **Invalid invite, or I\'m banned from there.**')
+		else:
+			def chan_type(channel):
+				if isinstance(channel, discord.PartialInviteChannel):
+					if channel.type == discord.ChannelType.text:
+						return '#'
+					elif channel.type == discord.ChannelType.voice:
+						return '\\🔊'
+					else:
+						return ''
+				else:
+					if isinstance(channel, discord.TextChannel):
+						return '#'
+					elif isinstance(channel, discord.VoiceChannel):
+						return '\\🔊'
+					else:
+						return ''
+
+			desc = '• Server: **' + str(invite.guild) + '** (' + str(invite.guild.id) + ')\n• Channel: **' + chan_type(invite.channel) + str(invite.channel) + '** (' + str(invite.channel.id) + ')\n' + ('• Inviter: **' + str(invite.inviter) + '** (' + str(invite.inviter.id) + ')\n' if invite.inviter else '') + ('• Features: ' + ', '.join(['**' + feature + '**' for feature in invite.guild.features]) + '\n' if invite.guild.features else '') + '\n• Active Members: **' + str(invite.approximate_presence_count) + '** / **' + str(invite.approximate_member_count) + '**'
+			embed = discord.Embed(title = 'About Invite', description = desc, color = 0x08FF00)
+			if invite.guild.icon:
+				embed.set_thumbnail(url = invite.guild.icon_url_as(size = 128))
+			if invite.guild.banner:
+				embed.set_image(url = invite.guild.banner_url)
+			await ctx.send(embed = embed)
+
+	@commands.command()
+	async def snowflake(self, ctx, snowflake: int):
+		await ctx.send(content = '```fix\n' + discord.utils.snowflake_time(snowflake).strftime('%A %Y/%m/%d %H:%M:%S UTC') + '\n```')
 
 
 def setup(bot):

@@ -88,5 +88,15 @@
 		"title": ["snipe"],
 		"description": "Snipe the last deleted message from a specified channel. Defaults to current channel.",
 		"examples": ["snipe", "snipe #general"]
+	},
+	"lookup": {
+		"title": ["lookup"],
+		"description": "Look up general information about a Discord invite URL/code.",
+		"examples": ["lookup sbySHxA"]
+	},
+	"snowflake": {
+		"title": ["snowflake"],
+		"description": "Gets the creation date and time of the specified Discord snowflake (ID).",
+		"examples": ["snowflake 418455732741079040"]
 	}
 }

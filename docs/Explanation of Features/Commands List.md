@@ -108,6 +108,19 @@
 |Example|`>randsubmit Meme This is a meme quote.`|
 
 
+## Other
+
+|Command|`>lookup`|
+|---|---|
+|Description|Look up general information about a Discord invite URL/code.|
+|Example|`>lookup sbySHxA`|
+
+|Command|`>snowflake`|
+|---|---|
+|Description|Gets the creation date and time of the specified Discord snowflake (ID).|
+|Example|`>snowflake 418455732741079040`|
+
+
 ## Owner
 
 |Command|`>randqueue`|
