@@ -8,7 +8,7 @@ Quote is a Discord bot that allows users to easily quote messages, a feature tha
 
 
 
-# Features
+## Features
 Reaction Quoting: React to a message with 💬 (`:speech_balloon:`). This is toggled with the command `>reactions`. (Requires `Manage Server` permission.)
 
 Link Quoting: Copy a direct link to a message, and paste it in chat and Quote will automatically embed the linked message.
@@ -16,6 +16,8 @@ Link Quoting: Copy a direct link to a message, and paste it in chat and Quote wi
 Command Quoting: You can quote by using the `>quote` command.
 
 Message Sniping: Check the last deleted messages by using the command `>snipe`.
+
+*Want to know more? Click on `Quoting` under `Explanation of Features` on the left-hand side menu.*
 
 
 
