@@ -10,5 +10,6 @@ pages:
     - Bug Reporting: Guides/Reporting Bugs.md
 - Explanation of Features:
     - Commands List: Explanation of Features/Commands List.md
+    - Quoting: Explanation of Features/Quoting.md
 
 theme: readthedocs
