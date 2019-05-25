@@ -17,7 +17,8 @@ Command Quoting: You can quote by using the `>quote` command.
 
 Message Sniping: Check the last deleted messages by using the command `>snipe`.
 
-*Want to know more? Click on `Quoting` under `Explanation of Features` on the left-hand side menu.*
+### More features
+*Want to know more? [Click Here.](https://quote.rtfd.io/en/latest/Explanation%20of%20Features/Quoting)*
 
 
 
