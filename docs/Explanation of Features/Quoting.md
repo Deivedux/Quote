@@ -23,6 +23,8 @@
   * To obtain the link to a message enable `Developer Mode`, as described above, and click on the three dots to the right of a message, there will be a `Copy Link` option.
 
   * ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
+  
+### More
 
 * The footer contains useful information on the requester, channel of the original message and timestamp of the original message.
 
