@@ -1,7 +1,6 @@
 [![Support Server](https://discordapp.com/api/guilds/418455732741079040/widget.png?style=shield)](https://discord.gg/sbySHxA)
 [![Quote Bot](https://discordbots.org/api/widget/status/447176783704489985.svg)](https://discordbots.org/bot/447176783704489985)
 [![Code Quality](https://api.codacy.com/project/badge/Grade/81a0a0e33ddd4a32882fe57ebb5d60a1)](https://app.codacy.com/app/aki-jp/Quote?utm_source=github.com&utm_medium=referral&utm_content=Deivedux/Quote&utm_campaign=Badge_Grade_Dashboard)
-[![Upvote](https://aki-toga.tk/css/support.png)](https://discordbots.org/bot/447176783704489985/vote)
 
 # Quote and reply to messages on Discord!
 Quote is a Discord bot that allows users to easily quote messages, a feature that any serious messaging platform should have but is missing from Discord.
@@ -17,8 +16,9 @@ Command Quoting: You can quote by using the `>quote` command.
 
 Message Sniping: Check the last deleted messages by using the command `>snipe`.
 
-### More features
-*Want to know more? [Click Here.](https://quote.rtfd.io/en/latest/Explanation%20of%20Features/Quoting)*
+*For more depth in Quoting, click [here](https://quote.rtfd.io/en/latest/Explanation%20of%20Features/Quoting).*
+
+*For the complete command and feature list, click [here](https://quote.rtfd.io/en/latest/Explanation%20of%20Features/Command%20List).*
 
 
 
