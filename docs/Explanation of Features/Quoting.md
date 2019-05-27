@@ -10,7 +10,7 @@ __ __
 
   * To get message IDs you need to enable Developer Mode in your `User Settings` -> `Appearance` > `Developer Mode`, and right click on a message then `Copy ID`.
 
-  ![Developer Mode](https://cdn.discordapp.com/attachments/154295458531901441/526118407071072281/unknown.png)
+  ![Developer Mode](https://cdn.discordapp.com/attachments/521720029008363520/582514463060787200/unknown.png)
 
   ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
 
