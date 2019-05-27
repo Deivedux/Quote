@@ -2,7 +2,7 @@
 
 * You can quote messages by reacting with 💬 (`:speech_balloon:`) to them (this feature needs to be enabled first by using the `>reactions` command).
 
-__ __
+---
 
 # Command Quoting 
 
@@ -14,7 +14,7 @@ __ __
 
   ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
 
-__ __
+---
 
 # Link Quoting
 

@@ -1,7 +1,7 @@
 # Commands list
 *Some commands may require special server permissions to execute.*
 
-__ __
+---
 
 ## Help
 
@@ -15,7 +15,7 @@ __ __
 |Description|List users that support Quote on Patreon.|
 |Example|`>donators`|
 
-__ __
+---
 
 ## Quoting
 
@@ -34,7 +34,7 @@ __ __
 |Description|Duplicate messages from one channel to the other with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from, third argument is the target channels to duplicate messages to (defaults to current). User requires `Manage Server` permission to execute. Limited to 2 uses per 30 second time frame per server.|
 |Example|`dupe 20 #from #to` or `>dupe 20 #chat`|
 
-__ __
+---
 
 ## Server
 
@@ -59,7 +59,7 @@ __ __
 |Permission|Manage Messages|
 |Example|`>pinchannel #channel` or `>pinchannel`|
 
-__ __
+_---
 
 ## Personal Quoting
 
@@ -93,7 +93,7 @@ __ __
 |Description|Deletes all your personal quotes.|
 |Example|`>pclear`|
 
-__ __
+---
 
 ## Random Quotes
 
@@ -112,7 +112,7 @@ __ __
 |Description|Submit your own quote for a specified category. First argument is a category name, everything after it is a quote. Only works in DM channels. To prevent unwanted spam, command is limited to 5 uses within an hour per user, regardless of it's success. Limited to 5 uses per 60 minute time frame per user.|
 |Example|`>randsubmit Meme This is a meme quote.`|
 
-__ __
+---
 
 ## Other
 
@@ -126,7 +126,7 @@ __ __
 |Description|Gets the creation date and time of the specified Discord snowflake (ID).|
 |Example|`>snowflake 418455732741079040`|
 
-__ __
+---
 
 ## Owner
 

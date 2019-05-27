@@ -6,7 +6,7 @@ There are 2 ways of reporting bugs.
 
 2nd way is via Discord server.
 
-__ __
+---
 
 # GitHub
 
@@ -16,7 +16,7 @@ Describe the bug you've found and steps on reproducing it as detailed as you can
 
 **Providing screenshots of the bug will enable us to help you even quicker with your bug!**
 
-__ __
+---
 
 # Discord server
 

@@ -2,7 +2,7 @@
 
 > Notepad++ (Or some other decent text editing software.)
 
-__ __
+---
 
 # Explanation Of Features
 
@@ -31,7 +31,7 @@ If a server has less than `x` (default `20`) members and if the bots make up to 
 
 ![](https://i.imgur.com/OakxxaJ.gif)
 
-__ __
+---
 
 # Windows
 
@@ -45,7 +45,7 @@ __ __
 
 > You can now launch the bot from the Windows installer. Enjoy.
 
-__ __
+---
 
 # Linux
 
