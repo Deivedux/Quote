@@ -2,7 +2,7 @@
 
 * You can quote messages by reacting with 💬 (`:speech_balloon:`) to them (this feature needs to be enabled first by using the `>reactions` command).
 
-
+__ __
 
 # Command Quoting 
 
@@ -10,11 +10,11 @@
 
   * To get message IDs you need to enable Developer Mode in your `User Settings` -> `Appearance` > `Developer Mode`, and right click on a message then `Copy ID`.
 
-  * ![Developer Mode](https://cdn.discordapp.com/attachments/154295458531901441/526118407071072281/unknown.png)
+  ![Developer Mode](https://cdn.discordapp.com/attachments/154295458531901441/526118407071072281/unknown.png)
 
-  * ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
+  ![Copy ID](https://cdn.discordapp.com/attachments/154295458531901441/526118743550722049/unknown.png)
 
-
+__ __
 
 # Link Quoting
 
@@ -22,7 +22,7 @@
 
   * To obtain the link to a message enable `Developer Mode`, as described above, and click on the three dots to the right of a message, there will be a `Copy Link` option.
 
-  * ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
+  ![Copy Link](https://cdn.discordapp.com/attachments/154295458531901441/526117532248047626/unknown.png)
   
 ### More
 
