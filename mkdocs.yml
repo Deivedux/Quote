@@ -9,7 +9,7 @@ pages:
 - Other Guides:
     - Bug Reporting: Guides/Reporting Bugs.md
 - Explanation of Features:
-    - Commands List: Explanation of Features/Commands List.md
+    - Commands List: Explanation of Features/Command List.md
     - Quoting: Explanation of Features/Quoting.md
 
 theme: readthedocs
