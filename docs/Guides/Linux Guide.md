@@ -34,7 +34,7 @@ apt install python3
 
 > Last but not least, inviting your bot.
 
-> Replace `<bot_id>` with your bot's ID in this link: `https://discordapp.com/oauth2/authorize?client_id=<bot id>&permissions=84992&scope=bot`
+> Replace `<bot_id>` with your bot's ID in this link: `https://discordapp.com/oauth2/authorize?client_id=<bot id>&permissions=347136&scope=bot`
 
 > Once you replaced `<bot_id>` with your bot's ID, copy the link in a new tab (the current tab also works) and select your server.
 
