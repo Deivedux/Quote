@@ -59,7 +59,7 @@
 |Permission|Manage Messages|
 |Example|`>pinchannel #channel` or `>pinchannel`|
 
-_---
+---
 
 ## Personal Quoting
 
