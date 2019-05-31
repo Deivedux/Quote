@@ -85,9 +85,9 @@ class Owneronly(commands.Cog):
 		guild = self.bot.get_guild(guild_id)
 		if guild:
 			await guild.leave()
-			await ctx.send(content = success_string + ' **Successfully left guild.**')
+			await ctx.send(content = success_string + ' **Successfully left the guild.**')
 		else:
-			await ctx.send(content = error_string + ' **No such server found.**')
+			await ctx.send(content = error_string + ' **No guild found.**')
 
 	@commands.command()
 	@commands.check(is_owner)

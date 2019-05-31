@@ -45,7 +45,7 @@ class PersonalQuotes(commands.Cog):
 	@commands.command(aliases = ['padd'])
 	async def personaladd(self, ctx, trigger, *, response = None):
 		if not response and not ctx.message.attachments:
-			return await ctx.send(content = error_string + ' **You must include at least a response or an attachment in your message.**')
+			return await ctx.send(content = error_string + ' **You must include a response or an attachment in your message.**')
 		else:
 			try:
 				DBService.exec("INSERT INTO PersonalQuotes (User, Trigger" + (", Response" if response else "") + (", Attachments" if ctx.message.attachments else "") + ") VALUES (" + str(ctx.author.id) + ", '" + trigger.replace('\'', '\'\'') + "'" + (", '" + response.replace('\'', '\'\'') + "'" if response else "") + (", '" + " | ".join([attachment.url for attachment in ctx.message.attachments]).replace('\'', '\'\'') + "'" if ctx.message.attachments else "") + ")")
