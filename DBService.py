@@ -9,7 +9,12 @@ c.execute("CREATE TABLE IF NOT EXISTS ServerConfig (Guild INTEGER unique, Prefix
 c.execute("CREATE TABLE IF NOT EXISTS Blacklist (Id INTEGER unique, Reason TEXT)")
 c.execute("CREATE TABLE IF NOT EXISTS PersonalQuotes (User INTEGER, Trigger TEXT, Response TEXT, Attachments TEXT, PRIMARY KEY (User, Trigger))")
 c.execute("CREATE TABLE IF NOT EXISTS Donators (UserId INTEGER unique, UserTag TEXT)")
-c.execute("CREATE TABLE IF NOT EXISTS RandomQuotes (QuoteID INTEGER PRIMARY KEY, Author INTEGER, Category TEXT, Quote TEXT, Approved INTEGER)")
+c.execute("DROP TABLE IF EXISTS RandomQuotes")
+
+try:
+	c.execute("ALTER TABLE ServerConfig ADD COLUMN WebhookURL TEXT")
+except sqlite3.OperationalError:
+	pass
 
 class DBService:
 
