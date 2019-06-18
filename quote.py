@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import json
+import requests
 import DBService
 from discord.ext import commands
 from cogs.Main import server_config
@@ -34,11 +35,13 @@ for cog in startup_extensions:
 	except Exception as e:
 		print(e)
 
-if len(response_json['botlog_webhook_url']) > 0 and response_json['botlog_webhook_url'].startswith('https://discordapp.com/api/webhooks/'):
-	try:
-		bot.load_extension('cogs.BotLog')
-	except Exception as e:
-		print(e)
+if len(response_json['botlog_webhook_url']) > 0 and 'discordapp.com/api/webhooks/' in response_json['botlog_webhook_url']:
+	r = requests.get(response_json['botlog_webhook_url'])
+	if r.status_code == 200:
+		try:
+			bot.load_extension('cogs.BotLog')
+		except Exception as e:
+			print(e)
 
 if response_json['anti_bot_farm']['enabled'] == True:
 	try:
