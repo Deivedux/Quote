@@ -32,7 +32,7 @@
 |Command|`>duplicate` / `>dupe`|
 |---|---|
 |Description|Duplicate messages from one channel to the other with a help of a webhook. First argument is the number of messages to duplicate (max 100), second argument is the channel to duplicate messages from, third argument is the target channels to duplicate messages to (defaults to current). User requires `Manage Server` permission to execute. Limited to 2 uses per 30 second time frame per server.|
-|Example|`dupe 20 #from #to` or `>dupe 20 #chat`|
+|Example|`>dupe 20 #from #to` or `>dupe 20 #chat`|
 
 ---
 
