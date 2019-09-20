@@ -34,7 +34,10 @@ class MessageURL(commands.Cog):
 			return
 
 		for i in message.content.split():
-			word = i.lower().strip('<>')
+			word = i.lower()
+			if word.startswith('<') and word.endswith('>'):
+				continue
+			word = word.strip('<>')
 			if word.startswith('https://canary.discordapp.com/channels/'):
 				word = word.strip('https://canary.discordapp.com/channels/')
 			elif word.startswith('https://ptb.discordapp.com/channels/'):
